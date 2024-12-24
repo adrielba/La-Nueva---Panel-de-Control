@@ -1,0 +1,16 @@
+<div class="login-container">
+    <form (ngSubmit)="onLogin()">
+        <h2>Ingreso</h2>
+        <div class="input-group">
+            <input type="text" [(ngModel)]="username" name="username" placeholder="Usuario" required>
+            <input type="password" [(ngModel)]="password" name="password" placeholder="Contraseña" required>
+        </div>
+        <button type="submit" class="btn" [disabled]="isLoading">Ingresar</button>
+    </form>
+</div>
+<div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>

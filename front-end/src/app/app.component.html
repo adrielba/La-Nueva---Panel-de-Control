@@ -1,0 +1,23 @@
+<header *ngIf="mostrarNavBar">
+    <div class="container">
+        <img src="https://res.cloudinary.com/dn23e5klx/image/upload/v1732588236/LogoLaNueva_jkedmv.png" alt="logo"
+        id="logo">
+    </div>
+    <div class="logout-btn">
+        <button type="submit" (click)="onLogout()">Salir</button>
+    </div>
+
+    <nav id="Nav">
+        <ul id="items">
+            <li><a routerLink="/inicio">Inicio</a></li>
+            <li *ngIf="currentRole === '????' || currentRole === '???'"><a routerLink="/bolillero">Bolillero</a></li>
+            <li><a routerLink="/ver-cartones">Ver Cartones</a></li>
+            <li *ngIf="currentRole === '????' || currentRole === '??'"><a routerLink="/cargar-cartones">Cargar Cartones</a></li>
+        </ul>
+    </nav>
+</header>
+<div class="content">
+    <router-outlet></router-outlet>
+</div>
+<app-footer></app-footer>
+

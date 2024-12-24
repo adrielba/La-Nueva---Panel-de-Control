@@ -1,0 +1,50 @@
+<div class="delete-container">
+    <h1>Eliminar Cartones</h1>
+
+    <label for="serie">Número de Serie:</label>
+    <input type="number" id="serie" required [(ngModel)]="numeroDeSerie" />
+    <button type="button" class="btn-buscar" (click)="buscarCartonesPorSerie(numeroDeSerie)" [disabled]="!numeroDeSerie">Ver</button>
+
+</div>
+<div class="overlay" *ngIf="mostrarResultadosOverlay">
+    <div class="overlay-content">
+        <button class="close-button" (click)="cerrarResultados()">X</button>
+        <div class="cartones-list">
+            <table *ngIf="cartones.length > 0">
+                <thead>
+                  <tr>
+                    <th>SERIE</th>
+                    <th *ngFor="let i of cabeceras">N{{ i }}</th>
+                    <th>Cartón</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let carton of cartones">
+                    <td>{{ carton.SERIE }}</td>
+                    <td *ngFor="let num of [carton.N1, carton.N2, carton.N3, carton.N4, carton.N5, carton.N6, carton.N7, carton.N8, carton.N9, carton.N10, carton.N11, carton.N12, carton.N13, carton.N14, carton.N15]">
+                      {{ num }}
+                    </td>
+                    <td>{{ carton.carton }}</td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+        <button class="btn-delete" (click)="confirmarEliminacion()">Eliminar</button>
+        <button class="btn-cancel" (click)="cerrarOverlay()">Cancelar</button>
+    </div>
+</div>
+    
+    <div class="overlay" *ngIf="mostrarConfirmacion">
+      <div class="overlay-content">
+        <h2>¿Estás seguro de eliminar la serie {{ numeroDeSerie }}?</h2>
+        <button class="btn-confirm" (click)="eliminarCartones()">Confirmar</button>
+        <button class="btn-cancel" (click)="cerrarConfirmacion()">Cancelar</button>
+      </div>
+    </div>
+  
+    <div class="message" *ngIf="mensajeExito">
+      <p>{{ mensajeExito }}</p>
+      <button (click)="cerrarMensaje()">Cerrar</button>
+    </div>
+
+  

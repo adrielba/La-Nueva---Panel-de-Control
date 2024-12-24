@@ -1,0 +1,28 @@
+body{
+    background-image: url('https://res.cloudinary.com/dn23e5klx/image/upload/v1731776390/Background_iqbrfk.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    margin: 0;
+    background-color: #d3eae0;
+}
+html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+
+:host {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+@media only screen and (max-width: 768px) {
+    body {
+        background-attachment: scroll;
+        background-position: top;
+    }
+}
