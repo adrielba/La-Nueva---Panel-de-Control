@@ -1,0 +1,70 @@
+<div class="search-container">
+    <h1>Ver Cartones</h1>
+
+    <label for="serie">Número de Serie:</label>
+    <input type="number" id="serie" required [(ngModel)]="numeroDeSerie" />
+    <button type="button" class="btn-buscar" (click)="buscarCartonesPorSerie(numeroDeSerie)" [disabled]="!numeroDeSerie">Buscar</button>
+
+    <button type="button" class="btn-lista" (click)="verCartones()">Ver Lista de Cartones</button>
+
+</div>
+<div class="overlay" *ngIf="mostrarResultadosOverlay">
+    <div class="overlay-content">
+        <button class="close-button" (click)="cerrarResultados()">X</button>
+        <div class="cartones-list">
+            <table *ngIf="cartones.length > 0">
+                <thead>
+                  <tr>
+                    <th>SERIE</th>
+                    <th *ngFor="let i of cabeceras">N{{ i }}</th>
+                    <th>Cartón</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let carton of cartones">
+                    <td>{{ carton.SERIE }}</td>
+                    <td *ngFor="let num of [carton.N1, carton.N2, carton.N3, carton.N4, carton.N5, carton.N6, carton.N7, carton.N8, carton.N9, carton.N10, carton.N11, carton.N12, carton.N13, carton.N14, carton.N15]">
+                      {{ num }}
+                    </td>
+                    <td>{{ carton.carton }}</td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>
+<div class="overlay" *ngIf="mostrarOverlay">
+    <div class="overlay-content">
+      <button class="close-button" (click)="cerrarOverlay()">X</button>
+      <h2>Lista de Cartones</h2>
+      <div class="cartones-list">
+        <table>
+          <thead>
+            <tr>
+              <th>SERIE</th>
+              <th *ngFor="let i of cabeceras">N{{ i }}</th>
+              <th>Cartón</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let carton of cartones">
+              <td>{{ carton.SERIE }}</td>
+              <td *ngFor="let num of [carton.N1, carton.N2, carton.N3, carton.N4, carton.N5, carton.N6, carton.N7, carton.N8, carton.N9, carton.N10, carton.N11, carton.N12, carton.N13, carton.N14, carton.N15]">
+                {{ num }}
+              </td>
+              <td>{{ carton.carton }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button [disabled]="currentPage === 1" (click)="verCartones(currentPage - 1)">Anterior</button>
+        <span>Página {{ currentPage }} de {{ totalPages }}</span>
+        <button [disabled]="currentPage === totalPages" (click)="verCartones(currentPage + 1)">Siguiente</button>
+        <input type="number" min="1" [max]="totalPages" [(ngModel)]="goToPage" (keyup.enter)="irAPagina(goToPage)" placeholder="Ir a página..." class="input-pagina"/>
+      </div>
+    </div>
+</div>
+
+
+

@@ -1,0 +1,96 @@
+<div class="bingo-container">
+    <div class="input-container">
+        <label for="rondaSelect">Ronda:</label>
+        <select id="rondaSelect" [(ngModel)]="selectedRonda" (ngModelChange)="validateEnvio()">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+        </select>
+        <label for="fecha">Fecha:</label>
+        <input id="fecha" type="date" [(ngModel)]="fechaSeleccionada" (ngModelChange)="validateEnvio()"/>
+        
+        <button class="btn-limpiar" type="submit" (click)="resetBingoData()">Limpiar</button>
+    </div>
+    <h3>Bolillas Cantadas: {{ cantNumb }}</h3>
+
+    <div class="recent-numbers-grid">
+        <div *ngFor="let num of recentNumbers" class="recent-number-cell" [class.latest]="num === latestNumber">
+            {{ num }}
+        </div>
+    </div>
+
+    <input type="number" [(ngModel)]="inputNumber" (keydown.enter)="markNumber()" min="1" max="90" class="input-pos"/>
+
+    <div class="main-content">
+        
+        <div *ngIf="mensaje" class="mensaje-flotante" [ngClass]="{'exito': exito, 'error': !exito}">
+            {{ mensaje }}
+        </div>
+        <div class="bingo-grid">
+            <div *ngFor="let cell of grid; let i = index" [class.marked]="markedNumbers.includes(i + 1)" [class.latest]="(i + 1) === latestNumber" class="grid-cell">
+                <span *ngIf="markedNumbers.includes(i + 1)">{{ i + 1 }}</span>
+            </div>
+        </div>
+    </div>
+    <button class="btn" type="submit" (click)="enviarDatos()" [disabled]="!isValid">Enviar Datos</button>  
+    <div class="form-text">
+        <a  class="tooltip">🛈Info<span class="tooltiptext">Envia a la base de datos la ronda, la fecha y los numeros. Para habilitar el boton: ronda y fecha deben estar selecionadas y por lo menos 15 numeros marcados</span></a>
+    </div>
+    
+
+</div>
+<div class="ver-block">
+    <div class="ver-container">
+        <h3>Ver Números más repetidos!</h3>
+        <label for="ver">Números más repetidos de la Fecha:</label>
+        <input type="date" [(ngModel)]="dateSelected">
+        <button (click)="verNumerosRepetidos()" type="submit" class="btn-ver-numeros">Ver</button>
+    </div>
+</div>
+<div class="overlay" *ngIf="showModal">
+    <div class="modal">
+        <button class="close-btn" (click)="cerrarModal()">X</button>
+        <img src="https://res.cloudinary.com/dn23e5klx/image/upload/v1731811328/BINGOO_uj58gs.png" alt="bingo">
+        <h2>¡TENEMOS GANADOR/ES!</h2>
+        <ul>
+            <li *ngFor="let ganador of ganadores">
+                <strong>Serie:</strong> {{ ganador.serie }} |
+                <strong>Carton:</strong> {{ganador.carton }}
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="overlay" *ngIf="showNumberModal">
+    <div class="modal">
+        <button class="close-btn" (click)="cerrarModal02()">X</button>
+        <h2>NUMEROS MAS REPETIDOS!</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Números</th>
+                    <th>Cantidad de veces que se repitió</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let numero of numerosRepetidos">
+                    <td>{{ numero.numero }}</td>
+                    <td>{{ numero.cantidad }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+

@@ -1,0 +1,57 @@
+<div class="bloque-cartones">
+    <div class="cartones-container">
+        <h1>Cargar Cartones</h1>
+      
+        <label for="serie">Número de Serie:</label>
+        <input
+          type="number"
+          id="serie"
+          [(ngModel)]="serie"
+          min="1"
+          required
+          (input)="validateForm()"
+        />
+        <h3>Cartón 1</h3>
+    <div class="carton-grid carton1">
+      <div *ngFor="let num of carton1Numbers; let i = index; trackBy: trackByIndex" class="cell">
+        <input
+          type="number"
+          [value]="num"
+          min="1"
+          max="90"
+          maxlength="2"
+          (input)="updateNumber(1, i, $event)"
+          (keydown.enter)="focusNextInput(1, i)"
+        />
+      </div>
+    </div>
+    
+    <h3>Cartón 2</h3>
+    <div class="carton-grid carton2">
+      <div *ngFor="let num of carton2Numbers; let i = index; trackBy: trackByIndex" class="cell">
+        <input
+          type="number"
+          [value]="num"
+          min="1"
+          max="90"
+          maxlength="2"
+          (input)="updateNumber(2, i, $event)"
+          (keydown.enter)="focusNextInput(2, i)"
+        />
+      </div>
+    </div>
+      
+        <button
+          type="button"
+          [disabled]="!isFormValid"
+          (click)="submitForm()"
+        >
+          Enviar
+        </button>
+      
+        <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+      </div>
+      <div class="delete-carto">
+        <app-eliminar-cartones></app-eliminar-cartones>
+      </div>
+</div>
