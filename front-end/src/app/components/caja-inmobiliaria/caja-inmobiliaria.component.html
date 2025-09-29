@@ -1,0 +1,182 @@
+<section class="card" style="margin-top: 16px">
+  <h3>Caja de la inmobiliaria</h3>
+
+  <div class="monthbar">
+    <button class="icon-btn" (click)="prevMonth()" aria-label="Mes anterior">
+      ◀
+    </button>
+    <span class="month-label">{{ monthLabel }}</span>
+    <button class="icon-btn" (click)="nextMonth()" aria-label="Mes siguiente">
+      ▶
+    </button>
+    <button class="link-btn" (click)="goToday()">Este mes</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="filters">
+      <input
+        [(ngModel)]="q"
+        placeholder="Buscar concepto o metodo"
+        (keyup.enter)="apply()"
+      />
+      <select [(ngModel)]="tipo">
+        <option value="">Todos</option>
+        <option value="ingreso">Ingresos</option>
+        <option value="egreso">Egresos</option>
+      </select>
+      <input type="date" [(ngModel)]="from" />
+      <input type="date" [(ngModel)]="to" />
+      <button (click)="apply()">Filtrar</button>
+      <button (click)="clear()">Limpiar</button>
+
+      <button class="btn-secondary" (click)="printCaja()">Imprimir</button>
+    </div>
+    <div class="page-size">
+      <label>Mostrar</label>
+      <select [(ngModel)]="pageSize" (change)="apply()">
+        <option [value]="10">10</option>
+        <option [value]="20">20</option>
+        <option [value]="50">50</option>
+      </select>
+      <span>por página</span>
+    </div>
+  </div>
+
+  <div class="totals">
+    <div><strong>Ingresos:</strong> {{ tot.ingresos | number : "1.2-2" }}</div>
+    <div><strong>Egresos:</strong> {{ tot.egresos | number : "1.2-2" }}</div>
+    <div><strong>Saldo:</strong> {{ tot.saldo | number : "1.2-2" }}</div>
+  </div>
+
+  <div class="summary" *ngIf="summary.length">
+    <h4>Resumen mensual</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Mes</th>
+          <th>Ingresos</th>
+          <th>Egresos</th>
+          <th>Saldo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of summary">
+          <td>{{ s.ym }}</td>
+          <td>{{ s.ingresos | number : "1.2-2" }}</td>
+          <td>{{ s.egresos | number : "1.2-2" }}</td>
+          <td>{{ s.saldo | number : "1.2-2" }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="actions">
+    <button class="btn-primary" (click)="openNew()">+ Nuevo</button>
+  </div>
+
+  <p *ngIf="loading">Cargando…</p>
+  <p *ngIf="errorMsg" class="err">{{ errorMsg }}</p>
+
+  <div class="table-wrapper" *ngIf="rows.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Concepto</th>
+          <th>Tipo</th>
+          <th>Importe</th>
+          <th>Método</th>
+          <th>Origen</th>
+          <th>Categoría</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of rows">
+          <td>{{ r.fecha }}</td>
+          <td class="truncate">{{ r.concepto }}</td>
+          <td>
+            <span
+              class="pill"
+              [class.income]="r.tipo === 'ingreso'"
+              [class.expense]="r.tipo === 'egreso'"
+            >
+              {{ r.tipo }}
+            </span>
+          </td>
+          <td>{{ r.monto | number : "1.2-2" }}</td>
+          <td>
+            <span
+              class="badge-method"
+              [class.cash]="r.metodo_pago === 'efectivo'"
+              [class.transfer]="r.metodo_pago === 'transferencia'"
+            >
+              {{ r.metodo_pago || "—" }}
+            </span>
+          </td>
+          <td>{{ r.origen_type === "mov" ? "Automático (mov)" : "Manual" }}</td>
+          <td class="truncate">{{ r.categoria_nombre || "—" }}</td>
+          <td>
+            <button
+              (click)="openEdit(r)"
+              [disabled]="r.origen_type !== 'manual'"
+            >
+              Editar
+            </button>
+            <button
+              (click)="eliminar(r)"
+              [disabled]="r.origen_type !== 'manual'"
+            >
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="paginator">
+      <button (click)="prev()" [disabled]="page === 1">Anterior</button>
+      <span>Página {{ page }} de {{ totalPages }}</span>
+      <button (click)="next()" [disabled]="page >= totalPages">
+        Siguiente
+      </button>
+    </div>
+  </div>
+
+  <p *ngIf="!rows.length && !loading && !errorMsg">Sin asientos.</p>
+</section>
+
+<!-- Modal -->
+<div class="overlay" *ngIf="formOpen" (click)="closeForm()"></div>
+<div class="modal" *ngIf="formOpen" (click)="$event.stopPropagation()">
+  <button class="modal-close" (click)="closeForm()">×</button>
+  <h4>{{ editingId ? "Editar asiento" : "Nuevo asiento" }}</h4>
+  <div class="grid" style="grid-template-columns: 1fr 1fr">
+    <label>Fecha <input type="date" [(ngModel)]="form.fecha" /></label>
+    <label
+      >Tipo
+      <select [(ngModel)]="form.tipo">
+        <option value="">—</option>
+        <option value="ingreso">Ingreso</option>
+        <option value="egreso">Egreso</option>
+      </select>
+    </label>
+    <label class="span2">Concepto <input [(ngModel)]="form.concepto" /></label>
+    <label>Monto <input type="number" [(ngModel)]="form.monto" /></label>
+    <label
+      >Método de pago
+      <select [(ngModel)]="form.metodo_pago">
+        <option value="">—</option>
+        <option value="efectivo">Efectivo</option>
+        <option value="transferencia">Transferencia</option>
+      </select>
+    </label>
+  </div>
+  <div class="modal-actions">
+    <span class="grow"></span>
+    <button class="btn-primary" (click)="guardar()">
+      {{ editingId ? "Guardar cambios" : "Crear" }}
+    </button>
+    <button (click)="closeForm()">Cancelar</button>
+  </div>
+</div>

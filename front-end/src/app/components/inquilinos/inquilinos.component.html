@@ -1,0 +1,322 @@
+<div class="inquilinos-page">
+  <section class="card">
+    <h3>Inquilinos</h3>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="filters">
+        <label>Búsqueda</label>
+        <input
+          type="text"
+          [(ngModel)]="q"
+          placeholder="Nombre / DNI/CUIT / Email / Domicilio"
+          (keyup.enter)="applyFilters()"
+        />
+        <button (click)="applyFilters()">Filtrar</button>
+        <button (click)="clearFilters()">Limpiar</button>
+
+        <label>Alquiler:</label>
+        <select [(ngModel)]="vigFilter">
+          <option value="">Todos</option>
+          <option value="vigente">Con alquiler vigente</option>
+          <option value="sin">Sin alquiler vigente</option>
+        </select>
+      </div>
+
+      <div class="page-size">
+        <label>Mostrar</label>
+        <select [(ngModel)]="pageSize" (change)="changePageSize()">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+        <span>por página</span>
+      </div>
+      <div class="print-actions">
+        <button class="btn-secondary" (click)="printAllInquilinos()">
+          🖨 Imprimir lista (completa)
+        </button>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="actions">
+      <button (click)="nuevo()" class="btn-primary">+ Nuevo inquilino</button>
+    </div>
+
+    <!-- Mensajes -->
+    <p class="msg err" *ngIf="errorMsg">{{ errorMsg }}</p>
+    <p class="msg" *ngIf="loading">
+      <span class="spinner2"></span>
+      Cargando...
+    </p>
+
+    <div class="paginator top">
+      <button (click)="prevPage()" [disabled]="page === 1">Anterior</button>
+      <span>Página {{ page }} de {{ totalPages }}</span>
+      <button (click)="nextPage()" [disabled]="page >= totalPages">
+        Siguiente
+      </button>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-wrapper" *ngIf="rows.length">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>DNI/CUIT</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Notas</th>
+            <th>Domicilio</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let r of rowsFiltered"
+            (click)="verDetalle(r)"
+            class="row-click"
+          >
+            <td class="truncate">{{ r.nombre }}</td>
+            <td>{{ r.dni_cuit || "—" }}</td>
+            <td>{{ r.telefono || "—" }}</td>
+            <td>{{ r.email || "—" }}</td>
+            <td class="truncate">{{ r.notas || "" }}</td>
+            <td class="truncate">{{ r.domicilio || "—" }}</td>
+            <td>
+              <button (click)="editar(r, $event)">Editar</button>
+              <button
+                (click)="eliminar(r, $event)"
+                [disabled]="!r.id"
+                class="btn-danger"
+              >
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p *ngIf="!rows.length && !loading && !errorMsg">
+      No hay registros para mostrar.
+    </p>
+  </section>
+</div>
+
+<!-- ============== OVERLAY: DETALLE INQUILINO (solo lectura) ============== -->
+<div class="overlay" *ngIf="detailOpen" (click)="closeDetail()"></div>
+
+<!-- Overlay -->
+<div class="overlay" *ngIf="emailOpen" (click)="emailOpen = false"></div>
+<div class="modal" *ngIf="emailOpen" (click)="$event.stopPropagation()">
+  <button class="modal-close" (click)="emailOpen = false">×</button>
+  <h4>Enviar email</h4>
+
+  <div class="grid" style="grid-template-columns: 1fr 1fr">
+    <label
+      >Para (email)
+      <input
+        [(ngModel)]="emailForm.to_email"
+        placeholder="destinatario@email.com"
+      />
+    </label>
+    <label
+      >Nombre (opcional)
+      <input
+        [(ngModel)]="emailForm.to_name"
+        placeholder="Nombre del destinatario"
+      />
+    </label>
+    <label class="span2"
+      >Asunto
+      <input [(ngModel)]="emailForm.subject" />
+    </label>
+    <label class="span2"
+      >Mensaje (HTML)
+      <textarea [(ngModel)]="emailForm.body_html" rows="10"></textarea>
+    </label>
+  </div>
+  <div class="grid span2" style="grid-template-columns: 1fr">
+    <label class="span2">
+      Adjuntos
+      <input type="file" multiple (change)="onInqEmailFilesSelected($event)" />
+      <small class="hint"
+        >Podés adjuntar varios (límite aprox. 18 MB total).</small
+      >
+    </label>
+
+    <div *ngIf="inqEmailAttachments.length" class="attachments-list">
+      <div
+        class="att-item"
+        *ngFor="let f of inqEmailAttachments; let i = index"
+      >
+        <span>{{ f.name }} ({{ f.size | number }} bytes)</span>
+        <button
+          type="button"
+          class="btn-mini"
+          (click)="removeInqEmailAttachment(i)"
+        >
+          Quitar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-actions">
+    <span class="grow"></span>
+    <button
+      class="btn-primary btn-flex"
+      (click)="sendEmail()"
+      [disabled]="emailSending"
+    >
+      <ng-container *ngIf="!emailSending; else sendingTpl">Enviar</ng-container>
+    </button>
+    <button (click)="emailOpen = false" [disabled]="emailSending">
+      Cancelar
+    </button>
+  </div>
+  <ng-template #sendingTpl>
+    <span class="spinner spinner--sm" aria-hidden="true"></span>
+    <span class="btn-text">Enviando…</span>
+  </ng-template>
+</div>
+
+<div
+  class="modal modal-detail"
+  *ngIf="detailOpen"
+  (click)="$event.stopPropagation()"
+  role="dialog"
+  aria-modal="true"
+>
+  <button class="modal-close" (click)="closeDetail()" aria-label="Cerrar">
+    ×
+  </button>
+
+  <h4>Inquilino: {{ detalle?.inquilino?.nombre }}</h4>
+  <div class="modal-header-actions" style="margin: 6px 0 12px">
+    <button class="btn-primary" (click)="printInquilinoDetail($event)">
+      🖨 Imprimir
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div class="grid">
+      <div>
+        <strong>DNI/CUIT:</strong> {{ detalle?.inquilino?.dni_cuit || "—" }}
+      </div>
+      <div>
+        <strong>Teléfono:</strong>
+        <ng-container *ngIf="detalle?.inquilino?.telefono; else noTel">
+          <a
+            [href]="
+              'https://wa.me/' + formatPhone(detalle?.inquilino?.telefono)
+            "
+            target="_blank"
+            rel="noopener noreferrer"
+            class="whatsapp-link"
+          >
+            {{ detalle?.inquilino?.telefono }}
+          </a>
+        </ng-container>
+        <ng-template #noTel>—</ng-template>
+      </div>
+      <div class="span2">
+        <strong>Email:</strong> {{ detalle?.inquilino?.email || "—" }}
+      </div>
+      <div class="span2">
+        <strong>Notas:</strong> {{ detalle?.inquilino?.notas || "" }}
+      </div>
+      <div class="span2">
+        <strong>Garantes:</strong> {{ detalle?.inquilino?.garantes || "—" }}
+      </div>
+    </div>
+    <div class="grid" style="margin-top: 10px">
+      <div class="span2">
+        <strong>Domicilio actual:</strong>
+        <ng-container *ngIf="detalle?.alquiler_actual; else noAlqVigente">
+          {{ detalle?.alquiler_actual?.direccion }}
+          <span class="muted">({{ detalle?.alquiler_actual?.mes }})</span>
+        </ng-container>
+        <ng-template #noAlqVigente>—</ng-template>
+      </div>
+      <div>
+        <strong>Alquiler vigente:</strong>
+        <ng-container
+          *ngIf="
+            detalle?.alquiler_actual?.alquiler_prop != null;
+            else noMontoVig
+          "
+        >
+          {{ detalle?.alquiler_actual?.alquiler_prop | number : "1.2-2" }}
+        </ng-container>
+        <ng-template #noMontoVig>—</ng-template>
+      </div>
+    </div>
+
+    <h5 style="margin-top: 12px">Domicilios (histórico):</h5>
+    <ul *ngIf="(detalle?.domicilios?.length || 0) > 0; else noDom">
+      <li *ngFor="let d of detalle?.domicilios || []" class="dom-item">
+        {{ d }}
+      </li>
+    </ul>
+    <ng-template #noDom>
+      <p class="muted">Sin domicilios históricos registrados en alquileres.</p>
+    </ng-template>
+  </div>
+
+  <div class="modal-actions">
+    <button
+      (click)="
+        openEmail(
+          detalle?.inquilino?.email || '',
+          detalle?.inquilino?.nombre || ''
+        )
+      "
+      title="Enviar email al inquilino"
+    >
+      Enviar email
+    </button>
+    <button (click)="closeDetail()">Cerrar</button>
+  </div>
+</div>
+
+<!-- ============== OVERLAY: EDITAR / NUEVO INQUILINO ============== -->
+<div class="overlay" *ngIf="editOpen" (click)="closeEdit()"></div>
+<div
+  class="modal modal-detail"
+  *ngIf="editOpen"
+  (click)="$event.stopPropagation()"
+  role="dialog"
+  aria-modal="true"
+>
+  <button class="modal-close" (click)="closeEdit()" aria-label="Cerrar">
+    ×
+  </button>
+
+  <h4>{{ editingId ? "Editar inquilino" : "Nuevo inquilino" }}</h4>
+
+  <div class="grid">
+    <label>Nombre <input [(ngModel)]="editForm.nombre" /></label>
+    <label>DNI/CUIT <input [(ngModel)]="editForm.dni_cuit" /></label>
+    <label>Teléfono <input [(ngModel)]="editForm.telefono" /></label>
+    <label class="span2">Email <input [(ngModel)]="editForm.email" /></label>
+    <label class="span2">Notas <input [(ngModel)]="editForm.notas" /></label>
+    <label class="span2"
+      >Garantes
+      <textarea [(ngModel)]="editForm.garantes" rows="3"></textarea>
+    </label>
+    <label
+      >Alquiler
+      <input type="number" step="0.01" [(ngModel)]="editForm.alquiler" />
+    </label>
+  </div>
+  <div class="modal-actions">
+    <button (click)="guardarEdit()" class="btn-primary">
+      {{ editingId ? "Guardar cambios" : "Crear" }}
+    </button>
+    <button (click)="closeEdit()">Cancelar</button>
+  </div>
+</div>

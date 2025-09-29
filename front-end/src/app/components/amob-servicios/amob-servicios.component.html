@@ -1,0 +1,97 @@
+<div class="amob-servicios">
+  <div class="actions">
+    <button class="btn-back" routerLink="/amoblados">◀ Volver</button>
+  </div>
+  <div class="card toolbar">
+    <div class="actions">
+      <button class="btn-primary" (click)="nuevo()">➕ Nuevo servicio</button>
+    </div>
+    <div class="filters">
+      <label>Buscar</label>
+      <input
+        type="text"
+        [(ngModel)]="q"
+        placeholder="Servicio / Cliente / Notas"
+      />
+      <button (click)="apply()">Aplicar</button>
+
+      <div class="page-size compact">
+        <label>Mostrar</label>
+        <select [(ngModel)]="pageSize" (change)="changePageSize()">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Servicio</th>
+          <th>Cliente Nº</th>
+          <th>Notas</th>
+          <th class="nowrap">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of rows">
+          <td class="nowrap">{{ r.servicio }}</td>
+          <td class="nowrap">{{ r.cliente_numero || "-" }}</td>
+          <td class="truncate" [title]="r.notas || ''">{{ r.notas || "" }}</td>
+          <td class="nowrap">
+            <button class="btn-mini" (click)="editar(r)">Editar</button>
+            <button class="btn-mini" (click)="eliminar(r)">Eliminar</button>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && rows.length === 0">
+          <td colspan="4" class="muted">Sin servicios.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="paginator inline">
+    <button (click)="prevPage()" [disabled]="page === 1">◀</button>
+    <span class="muted">Página {{ page }}</span>
+    <button (click)="nextPage()">▶</button>
+  </div>
+
+  <!-- Modal -->
+  <div class="overlay" *ngIf="formOpen" (click)="cancelar()"></div>
+  <div
+    class="modal modal-form"
+    *ngIf="formOpen"
+    (click)="$event.stopPropagation()"
+  >
+    <button class="modal-close" (click)="cancelar()">✕</button>
+    <h3>{{ editingId ? "Editar servicio" : "Nuevo servicio" }}</h3>
+
+    <div class="modal-body">
+      <div class="modal-grid">
+        <label class="span2">
+          <span class="lbl">Servicio</span>
+          <input [(ngModel)]="form.servicio" autofocus />
+        </label>
+        <label>
+          <span class="lbl">Cliente Nº</span>
+          <input [(ngModel)]="form.cliente_numero" />
+        </label>
+        <label class="span2">
+          <span class="lbl">Notas</span>
+          <textarea rows="3" [(ngModel)]="form.notas"></textarea>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <div class="grow"></div>
+      <button class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      <button class="btn-primary" (click)="guardar()">
+        {{ editingId ? "Guardar cambios" : "Crear" }}
+      </button>
+    </div>
+  </div>
+</div>

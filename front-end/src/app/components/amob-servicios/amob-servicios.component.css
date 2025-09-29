@@ -1,0 +1,161 @@
+/* ===== Layout local ===== */
+.amob-servicios .toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.amob-servicios .filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Compactor de tabla */
+.amob-servicios .table-wrapper table {
+  width: 100%;
+  table-layout: fixed; /* hace columnas más parejas y angostas */
+  border-collapse: collapse;
+  font-size: 14px; /* un pelín más chica */
+}
+
+.amob-servicios table th,
+.amob-servicios table td {
+  padding: 6px 8px; /* menos espacio horizontal y vertical */
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.amob-servicios table thead th {
+  font-weight: 600;
+  background: #fafafa;
+}
+
+.amob-servicios .nowrap {
+  white-space: nowrap;
+}
+
+.amob-servicios .truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Anchos sugeridos (ajustá si querés) */
+.amob-servicios table th:nth-child(1),
+.amob-servicios table td:nth-child(1) {
+  /* Servicio */
+  width: 22%;
+}
+.amob-servicios table th:nth-child(2),
+.amob-servicios table td:nth-child(2) {
+  /* Cliente Nº */
+  width: 12%;
+}
+.amob-servicios table th:nth-child(3),
+.amob-servicios table td:nth-child(3) {
+  /* Notas */
+  width: 46%;
+}
+.amob-servicios table th:nth-child(4),
+.amob-servicios table td:nth-child(4) {
+  /* Acciones */
+  width: 20%;
+  text-align: right;
+}
+
+/* Acciones compactas */
+.amob-servicios td .btn-mini {
+  margin-left: 6px;
+}
+
+/* Paginador más pegado */
+.amob-servicios .paginator.inline {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== Modal / Overlay (solo por si tus estilos base son genéricos) ===== */
+.amob-servicios .overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 18, 18, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.amob-servicios .modal.modal-form {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: 560px;
+  max-width: 92vw;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding-bottom: 8px;
+}
+
+.amob-servicios .modal h3 {
+  margin: 0;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eee;
+  font-size: 18px;
+}
+
+.amob-servicios .modal-body {
+  padding: 14px 16px;
+}
+
+.amob-servicios .modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+}
+
+.amob-servicios .modal-grid .span2 {
+  grid-column: span 2;
+}
+
+.amob-servicios .lbl {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.amob-servicios .form-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.amob-servicios .modal-close {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  border: 0;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* Inputs del modal un poco más compactos */
+.amob-servicios input[type="text"],
+.amob-servicios textarea {
+  width: 90%;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+}
+.amob-servicios input[type="text"]:focus,
+.amob-servicios textarea:focus {
+  border-color: #bbb;
+}

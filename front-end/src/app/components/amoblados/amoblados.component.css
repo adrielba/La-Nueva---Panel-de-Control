@@ -1,0 +1,230 @@
+/* Solo la tabla de Amoblados */
+.amoblados-table {
+  table-layout: fixed; /* fuerza ancho fijo */
+  width: 100%; /* ocupa todo el ancho disponible */
+  border-collapse: collapse;
+}
+
+.amoblados-table th,
+.amoblados-table td {
+  padding: 4px 6px; /* menos espacio horizontal */
+  font-size: 0.9rem;
+}
+
+/* Opcional: definí anchos máximos para columnas */
+.amoblados-table th:nth-child(1), /* Fecha */
+.amoblados-table td:nth-child(1) {
+  width: 110px;
+}
+
+.amoblados-table th:nth-child(2), /* Inquilino */
+.amoblados-table td:nth-child(2) {
+  width: 140px;
+}
+
+.amoblados-table th:nth-child(3), /* Dirección */
+.amoblados-table td:nth-child(3) {
+  width: 160px;
+}
+
+/* Montos más angostos */
+.amoblados-table th:nth-child(4),
+.amoblados-table td:nth-child(4),
+.amoblados-table th:nth-child(5),
+.amoblados-table td:nth-child(5),
+.amoblados-table th:nth-child(6),
+.amoblados-table td:nth-child(6),
+.amoblados-table th:nth-child(7),
+.amoblados-table td:nth-child(7),
+.amoblados-table th:nth-child(8),
+.amoblados-table td:nth-child(8) {
+  width: 100px;
+}
+
+.amoblados-table th:nth-child(9),
+.amoblados-table td:nth-child(9),
+.amoblados-table th:nth-child(10),
+.amoblados-table td:nth-child(10) {
+  width: 180px;
+}
+
+/* Notas largas en el detalle */
+.detail-notes {
+  white-space: pre-wrap;
+  background: #f9fafb;
+  border: 1px dashed #e5e7eb;
+  border-radius: 8px;
+  padding: 8px;
+  line-height: 1.35;
+}
+
+.direccion-table th,
+.direccion-table td {
+  padding: 4px 6px; /* menos espacio horizontal */
+  font-size: 0.9rem;
+}
+.direccion-table th:nth-child(1),
+.direccion-table td:nth-child(1) {
+  width: 380px;
+}
+/* ====== SLIDER DE DÍAS – compacto y cómodo ====== */
+.alquileres-container .days-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* ◀ | días | ▶ */
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+
+  /* ancho RESPONSIVE, no gigante ni minúsculo */
+  width: clamp(360px, 42vw, 560px);
+  justify-self: center; /* queda centrado en la toolbar */
+}
+
+.alquileres-container .days-bar .month-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.alquileres-container .days-bar .days-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  flex: 1 1 auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 4px;
+
+  /* que se “ancle” al centro al hacer scroll */
+  scroll-snap-type: x mandatory;
+
+  /* leve degradé que indica que hay más días a los costados */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 16px,
+    #000 calc(100% - 16px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 16px,
+    #000 calc(100% - 16px),
+    transparent 100%
+  );
+}
+
+/* cada día: cuadradito chico */
+.alquileres-container .days-bar .ditem {
+  flex: 0 0 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #f3f4f6;
+  font-size: 12px;
+  font-weight: 600;
+  user-select: none;
+  cursor: pointer;
+
+  scroll-snap-align: center; /* queda centrado al soltar */
+}
+.alquileres-container .days-bar .ditem:hover {
+  background: #e5e7eb;
+}
+.alquileres-container .days-bar .ditem.active {
+  background: #1e88e5;
+  color: #fff;
+}
+
+/* flechas chicas, siempre visibles */
+.alquileres-container .days-bar .ybtn {
+  width: 30px;
+  height: 30px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  cursor: pointer;
+}
+.alquileres-container .days-bar .ybtn:hover {
+  background: #eef2ff;
+}
+
+/* botón "Hoy" mini junto al mes */
+.alquileres-container .days-bar .btn-mini {
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+.alquileres-container .days-bar .btn-mini:hover {
+  background: #eef2ff;
+}
+.alquileres-container .days-bar .days-scroll {
+  scrollbar-gutter: stable both-edges;
+}
+
+/* --------- IMPRESIÓN DEL DETALLE DE AMOBLADOS --------- */
+@media print {
+  /* Oculta TODO por defecto */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Muestra SOLO el modal de detalle y su descendencia */
+  .modal.modal-detail,
+  .modal.modal-detail * {
+    visibility: visible !important;
+  }
+
+  /* Quita overlay y estilos de modal para que parezca una hoja */
+  .overlay {
+    display: none !important;
+  }
+
+  .modal.modal-detail {
+    position: static !important;
+    inset: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-height: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
+  /* Espaciado agradable en papel */
+  .modal.modal-detail h3 {
+    margin: 0 0 8mm !important;
+  }
+  .modal.modal-detail .detail-grid {
+    gap: 4mm !important;
+  }
+
+  /* Ocultá controles de UI */
+  .modal-close,
+  .modal.modal-detail .form-actions {
+    display: none !important;
+  }
+
+  /* Opcional: tipografía para impresión */
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+}

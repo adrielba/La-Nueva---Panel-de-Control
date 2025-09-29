@@ -1,0 +1,127 @@
+<section class="card" *ngIf="!loading && !errorMsg && prop">
+  <div class="actions">
+    <button class="btn-back" routerLink="/propiedades">◀ Volver</button>
+  </div>
+  <h3>Detalle de la propiedad</h3>
+  <div class="grid">
+    <div class="span2"><strong>Dirección:</strong> {{ prop.direccion }}</div>
+    <div><strong>Propietario:</strong> {{ propietarioNombre }}</div>
+    <div>
+      <strong>Tipo de domicilio:</strong> {{ prop.domicilio_tipo || "—" }}
+    </div>
+  </div>
+
+  <h4 style="margin-top: 12px">Alquiler</h4>
+  <div *ngIf="tieneAlquiler; else sinAlq">
+    <div><strong>Inquilino:</strong> {{ inquilinoActual }}</div>
+    <div>
+      <strong>Alquiler actual:</strong> {{ alquilerActual | number : "1.2-2" }}
+    </div>
+  </div>
+  <ng-template #sinAlq>
+    <div class="muted">No tiene alquiler activo este mes.</div>
+  </ng-template>
+</section>
+
+<p *ngIf="loading">Cargando…</p>
+<p *ngIf="errorMsg" class="err">{{ errorMsg }}</p>
+
+<section class="card" style="margin-top: 16px">
+  <h4>Servicios</h4>
+
+  <div class="toolbar">
+    <div class="filters">
+      <input
+        [(ngModel)]="servQ"
+        (keyup.enter)="servApply()"
+        placeholder="Buscar servicio / número / notas"
+      />
+      <button (click)="servApply()" [disabled]="servLoading">Buscar</button>
+      <button (click)="servClear()" [disabled]="servLoading">Limpiar</button>
+    </div>
+    <div class="actions">
+      <button class="btn-primary" (click)="openNewServ()">
+        + Nuevo servicio
+      </button>
+    </div>
+  </div>
+
+  <p *ngIf="servLoading">Cargando servicios…</p>
+  <p *ngIf="servError" class="err">{{ servError }}</p>
+
+  <div class="table-wrapper" *ngIf="servRows.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Servicio</th>
+          <th>Cliente / Número</th>
+          <th>Notas</th>
+          <th style="width: 160px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of servRows">
+          <td class="truncate">{{ s.servicio }}</td>
+          <td class="truncate">{{ s.cliente_numero || "—" }}</td>
+          <td class="truncate">{{ s.notas || "—" }}</td>
+          <td>
+            <button (click)="openEditServ(s)">Editar</button>
+            <button (click)="eliminarServ(s)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="paginator">
+      <button (click)="servPrev()" [disabled]="servPage === 1">Anterior</button>
+      <span>Página {{ servPage }} de {{ servTotalPages }}</span>
+      <button (click)="servNext()" [disabled]="servPage >= servTotalPages">
+        Siguiente
+      </button>
+    </div>
+  </div>
+
+  <p *ngIf="!servRows.length && !servLoading && !servError">
+    No hay servicios cargados.
+  </p>
+</section>
+
+<!-- Modal crear/editar servicio -->
+<div class="overlay" *ngIf="servFormOpen" (click)="closeServForm()"></div>
+<div class="modal" *ngIf="servFormOpen" (click)="$event.stopPropagation()">
+  <button class="modal-close" (click)="closeServForm()">×</button>
+  <h4>{{ servEditingId ? "Editar servicio" : "Nuevo servicio" }}</h4>
+
+  <div class="grid" style="grid-template-columns: 1fr 1fr">
+    <label
+      >Servicio
+      <input
+        [(ngModel)]="servForm.servicio"
+        placeholder="Ej: EDET, Aguas, Internet"
+      />
+    </label>
+    <label
+      >Cliente / Número
+      <input
+        [(ngModel)]="servForm.cliente_numero"
+        placeholder="N° cliente o referencia"
+      />
+    </label>
+    <label class="span2"
+      >Notas
+      <textarea
+        [(ngModel)]="servForm.notas"
+        rows="3"
+        placeholder="Datos adicionales, links, etc."
+      ></textarea>
+    </label>
+  </div>
+
+  <div class="modal-actions">
+    <span class="grow"></span>
+    <button class="btn-primary" (click)="guardarServ()">
+      {{ servEditingId ? "Guardar cambios" : "Crear" }}
+    </button>
+    <button (click)="closeServForm()">Cancelar</button>
+  </div>
+</div>

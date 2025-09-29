@@ -1,0 +1,9 @@
+# Angular
+/frontend/node_modules/
+/frontend/dist/
+
+# PHP
+/backend/vendor/
+
+# Otros
+.env

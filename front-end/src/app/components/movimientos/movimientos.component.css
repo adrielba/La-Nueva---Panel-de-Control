@@ -1,0 +1,307 @@
+.movs-page {
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+}
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  padding: 14px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.filters,
+.page-size {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.actions {
+  margin: 10px 0;
+}
+.table-wrapper {
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+th,
+td {
+  border-bottom: 1px solid #f1f3f5;
+  padding: 8px;
+  text-align: left;
+}
+thead th {
+  background: #f8fafc;
+  font-weight: 700;
+}
+.truncate {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.totals {
+  display: flex;
+  gap: 16px;
+  padding: 8px;
+  justify-content: flex-end;
+}
+.credito {
+  color: #0a7a0a;
+  font-weight: 600;
+}
+.debito {
+  color: #b00020;
+  font-weight: 600;
+}
+
+.paginator {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+}
+
+/* modal */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+}
+.modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  z-index: 1001;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+  width: min(900px, 96vw);
+  max-height: 92vh;
+  overflow: auto;
+}
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: 0;
+  font-size: 18px;
+  cursor: pointer;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 10px;
+}
+.grid label {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  gap: 4px;
+}
+.span2 {
+  grid-column: span 2;
+}
+
+.msg.err {
+  color: #c00;
+}
+.actions {
+  margin-bottom: 8px;
+}
+.btn-back {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  cursor: pointer;
+}
+.btn-back:hover {
+  background: #eef2ff;
+}
+.months-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 8px 0 12px;
+  flex-wrap: nowrap;
+}
+.year-label {
+  font-weight: 700;
+  min-width: 56px;
+  text-align: center;
+}
+.ybtn {
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.months-scroll {
+  display: flex;
+  gap: 8px;
+  overflow: auto hidden;
+  padding: 2px;
+}
+.mitem {
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 999px;
+  padding: 6px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mitem.active {
+  background: #1e40af;
+  border-color: #1e40af;
+  color: #fff;
+  font-weight: 700;
+}
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.months {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.months button {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f9fafb;
+  cursor: pointer;
+}
+
+.months button.active {
+  background: #2563eb;
+  color: #fff;
+  font-weight: bold;
+}
+.month-mini {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.month-mini__label {
+  min-width: 120px;
+  text-align: center;
+  font-weight: 700;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+.table-tools {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #f1f3f5;
+  background: #fafafa;
+}
+.table-tools .sm {
+  padding: 4px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+  cursor: pointer;
+}
+
+/* header de grupo */
+.group-header td {
+  background: #eef2ff;
+  border-bottom: 1px solid #dbe4ff;
+}
+.group-header {
+  cursor: pointer;
+}
+.group-header .gh-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+.group-header .toggle {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #c7d2fe;
+  background: #fff;
+  border-radius: 6px;
+}
+.group-header .gh-right {
+  float: right;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.pill {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  font-weight: 600;
+}
+.pill.ok {
+  color: #0a7a0a;
+}
+.pill.warn {
+  color: #b00020;
+}
+
+/* filas ocultas cuando el grupo está contraído */
+.hidden {
+  display: none;
+}
+
+/* permitir que Propiedad/Detalle hagan wrap y no se corten */
+.cell-wrap {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  max-width: 640px; /* ajustá si querés */
+  line-height: 1.25;
+}
+
+/* opcional: clamp a 2 líneas (solo webkit) */
+/*
+.cell-wrap{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+*/
+td:nth-child(5) strong.positivo {
+  color: #0a7a0a;
+}
+td:nth-child(5) strong.negativo {
+  color: #b00020;
+}

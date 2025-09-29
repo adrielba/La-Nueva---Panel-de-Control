@@ -1,0 +1,96 @@
+.admin-page {
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+}
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  padding: 14px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.table-wrapper {
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+}
+th,
+td {
+  border-bottom: 1px solid #f1f3f5;
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+}
+thead th {
+  background: #f8fafc;
+  font-weight: 700;
+}
+.paginator {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+}
+.err {
+  color: #c00;
+}
+
+.truncate {
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.payload-cell .clamp {
+  max-width: 480px;
+  max-height: 3.4em;
+  overflow: hidden;
+  position: relative;
+}
+.payload-cell .clamp.open {
+  max-height: none;
+}
+.payload-cell pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.pill {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #1e3a8a;
+  font-size: 11px;
+  font-weight: 700;
+}
+.btn-mini {
+  border: 0;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  background: #e5e7eb;
+}

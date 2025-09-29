@@ -1,0 +1,1248 @@
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-label">Alquileres activos</div>
+    <div class="stat-value">{{ stats.activos | number }}</div>
+    <div class="stat-hint">Ignora “LIBRE”</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Suma Alquiler (mes)</div>
+    <div class="stat-value">$ {{ stats.totalAlquiler | number : "1.0-0" }}</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Suma ADM (mes)</div>
+    <div class="stat-value">$ {{ stats.totalAdm | number : "1.0-0" }}</div>
+  </div>
+  <div class="stat stat--muted" title="Cantidad con inquilino 'LIBRE'">
+    <div class="stat-label">LIBRE</div>
+    <div class="stat-value">{{ stats.libres | number }}</div>
+  </div>
+</div>
+
+<!-- ACCIONES SUPERIORES -->
+<div class="actions">
+  <button (click)="nuevo()">+ Nuevo alquiler</button>
+</div>
+
+<!-- LISTA / FILTROS / TABS -->
+<div class="alquileres-container">
+  <section class="card">
+    <h3>Alquileres</h3>
+
+    <!-- TABS DE MESES -->
+    <div class="months-bar">
+      <button class="ybtn" (click)="prevYear()" title="Año anterior">«</button>
+      <div class="year-label">{{ selectedYear }}</div>
+
+      <div class="months-scroll">
+        <button
+          class="mitem"
+          *ngFor="let m of months"
+          [class.active]="isActiveMonth(m)"
+          (click)="selectMes(m)"
+        >
+          {{ m.label }}
+        </button>
+      </div>
+
+      <button class="ybtn" (click)="nextYear()" title="Año siguiente">»</button>
+    </div>
+
+    <!-- FILTROS -->
+    <!-- FILTROS -->
+    <div class="toolbar">
+      <!-- FILA 1: Mes, búsqueda y acciones de filtro -->
+      <div class="filters">
+        <label>Mes</label>
+        <input type="text" [(ngModel)]="filtroMes" placeholder="Ej: 09-25" />
+
+        <label>Búsqueda</label>
+        <input
+          type="text"
+          [(ngModel)]="q"
+          placeholder="Propietario / Monto / Inquilino / Dirección / Notas"
+          (keyup.enter)="applyFilters()"
+        />
+
+        <button (click)="applyFilters()">Filtrar</button>
+        <button (click)="clearFilters()">Limpiar</button>
+
+        <!-- Filtro de inquilino LIBRE -->
+        <div class="libre-filter">
+          <label>Inquilino</label>
+          <select [(ngModel)]="libreFilter" (change)="load()">
+            <option value="all">Todos</option>
+            <option value="hide">Ocultar “LIBRE”</option>
+            <option value="only">Sólo “LIBRE”</option>
+          </select>
+        </div>
+
+        <!-- Selector de columnas -->
+        <div class="cols-menu" [class.open]="colsOpen">
+          <button class="btn-secondary" (click)="colsOpen = !colsOpen">
+            ⚙ Columnas
+          </button>
+          <div
+            class="dropdown"
+            *ngIf="colsOpen"
+            (click)="$event.stopPropagation()"
+          >
+            <label class="ck"
+              ><input type="checkbox" [(ngModel)]="showCols.adm_text" /> ADM
+              txt</label
+            >
+            <label class="ck"
+              ><input type="checkbox" [(ngModel)]="showCols.pagoInq" /> Pago
+              Inq.</label
+            >
+            <label class="ck"
+              ><input type="checkbox" [(ngModel)]="showCols.finContrato" />
+              Finalización</label
+            >
+            <label class="ck"
+              ><input type="checkbox" [(ngModel)]="showCols.indexacion" />
+              Indexación</label
+            >
+            <label class="ck"
+              ><input type="checkbox" [(ngModel)]="showCols.domicilio" /> Tipo
+              Domicilio</label
+            >
+            <label class="ck"
+              ><input type="checkbox" [(ngModel)]="showCols.estado" />
+              Estado</label
+            >
+            <label class="ck"
+              ><input type="checkbox" [(ngModel)]="showCols.notas" />
+              Notas</label
+            >
+            <label class="ck"
+              ><input type="checkbox" [(ngModel)]="showCols.mes" /> Mes</label
+            >
+          </div>
+        </div>
+
+        <!-- Imprimir -->
+        <div class="print-menu" [class.open]="printMenuOpen">
+          <button
+            class="btn-secondary"
+            (click)="togglePrintMenu($event)"
+            title="Imprimir"
+          >
+            🖨 Imprimir
+          </button>
+          <div
+            class="dropdown"
+            *ngIf="printMenuOpen"
+            (click)="$event.stopPropagation()"
+          >
+            <button (click)="printCurrentPage()">Esta página</button>
+            <button (click)="printCurrentMonth()">Todo el mes filtrado</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILA 2: Paginador SIEMPRE debajo -->
+      <div class="paginator-bar">
+        <div class="left-pack">
+          <div class="paginator inline">
+            <button
+              (click)="prevPage()"
+              [disabled]="page === 1"
+              title="Anterior"
+            >
+              ◀
+            </button>
+            <span class="muted">Página {{ page }} de {{ totalPages }}</span>
+            <button
+              (click)="nextPage()"
+              [disabled]="page >= totalPages"
+              title="Siguiente"
+            >
+              ▶
+            </button>
+          </div>
+
+          <!-- Filtros avanzados -->
+          <div class="adv-menu" [class.open]="advOpen">
+            <button class="btn-secondary" (click)="advOpen = !advOpen">
+              🔎 Filtros avanzados
+            </button>
+
+            <div
+              class="dropdown xl"
+              *ngIf="advOpen"
+              (click)="$event.stopPropagation()"
+            >
+              <div class="adv-grid">
+                <!-- Columna 1: Montos -->
+                <div class="adv-col">
+                  <div class="adv-title">Montos</div>
+                  <label
+                    >Alquiler (min)
+                    <input type="number" [(ngModel)]="fAlqMin" />
+                  </label>
+                  <label
+                    >Alquiler (max)
+                    <input type="number" [(ngModel)]="fAlqMax" />
+                  </label>
+                  <label
+                    >ADM (min)
+                    <input type="number" [(ngModel)]="fAdmMin" />
+                  </label>
+                  <label
+                    >ADM (max)
+                    <input type="number" [(ngModel)]="fAdmMax" />
+                  </label>
+                  <label
+                    >Neto (min)
+                    <input type="number" [(ngModel)]="fNetMin" />
+                  </label>
+                  <label
+                    >Neto (max)
+                    <input type="number" [(ngModel)]="fNetMax" />
+                  </label>
+                </div>
+
+                <!-- Columna 2: Fechas -->
+                <div class="adv-col">
+                  <div class="adv-title">Fechas</div>
+                  <label
+                    >Alta desde
+                    <input type="date" [(ngModel)]="fAltaFrom" />
+                  </label>
+                  <label
+                    >Alta hasta
+                    <input type="date" [(ngModel)]="fAltaTo" />
+                  </label>
+                  <label
+                    >Cambia Monto desde
+                    <input type="date" [(ngModel)]="fCambFrom" />
+                  </label>
+                  <label
+                    >Cambia Monto hasta
+                    <input type="date" [(ngModel)]="fCambTo" />
+                  </label>
+                  <label
+                    >Pago Inq. desde
+                    <input type="date" [(ngModel)]="fPagoFrom" />
+                  </label>
+                  <label
+                    >Pago Inq. hasta
+                    <input type="date" [(ngModel)]="fPagoTo" />
+                  </label>
+                  <label
+                    >Fin Contrato desde
+                    <input type="date" [(ngModel)]="fFinFrom" />
+                  </label>
+                  <label
+                    >Fin Contrato hasta
+                    <input type="date" [(ngModel)]="fFinTo" />
+                  </label>
+                </div>
+
+                <!-- Columna 3: Estados -->
+                <div class="adv-col">
+                  <div class="adv-title">Estado</div>
+                  <label class="ck"
+                    ><input type="checkbox" [(ngModel)]="fEstados.pagado" />
+                    Pagado</label
+                  >
+                  <label class="ck"
+                    ><input type="checkbox" [(ngModel)]="fEstados.pendiente" />
+                    Pendiente</label
+                  >
+                  <label class="ck"
+                    ><input type="checkbox" [(ngModel)]="fEstados.noPagado" />
+                    No Pagado</label
+                  >
+                  <label class="ck"
+                    ><input type="checkbox" [(ngModel)]="fEstados.nulo" /> Vacío
+                    / Nulo</label
+                  >
+
+                  <div class="adv-actions">
+                    <button (click)="applyFilters()">Aplicar</button>
+                    <button class="btn-secondary" (click)="resetAdvanced()">
+                      Limpiar avanzados
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-size compact">
+            <label>Mostrar</label>
+            <select [(ngModel)]="pageSize" (change)="changePageSize()">
+              <option [value]="10">10</option>
+              <option [value]="20">20</option>
+              <option [value]="50">50</option>
+              <option [value]="100">100</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="msg err" *ngIf="errorMsg">{{ errorMsg }}</p>
+    <p class="msg" *ngIf="loading">
+      <span class="spinner2"></span>
+      Cargando...
+    </p>
+
+    <!-- TABLA -->
+    <div class="table-wrapper" *ngIf="rows.length">
+      <table>
+        <thead>
+          <tr>
+            <th (click)="sortBy('propietario')">Propietario</th>
+            <th (click)="sortBy('inquilino')">Inquilino</th>
+            <th (click)="sortBy('fecha_alta_contrato')">Alta</th>
+            <th (click)="sortBy('direccion')">Dirección</th>
+            <th (click)="sortBy('alquiler_prop')">Alquiler</th>
+            <th (click)="sortBy('adm')">ADM</th>
+            <th *ngIf="showCols.adm_text">ADM txt</th>
+            <th (click)="sortBy('neto_propietario')">Neto Prop.</th>
+            <th
+              *ngIf="showCols.cambiaMonto"
+              (click)="sortBy('vencimiento_montos')"
+            >
+              Cambia Monto
+            </th>
+            <th
+              *ngIf="showCols.pagoInq"
+              (click)="sortBy('fecha_pago_inquilino')"
+            >
+              Pago Inq.
+            </th>
+            <th
+              *ngIf="showCols.finContrato && showVencMontoCol"
+              (click)="sortBy('venc_monto')"
+            >
+              Finalizacion Contrato
+            </th>
+            <th *ngIf="showCols.indexacion" (click)="sortBy('indexacion_tipo')">
+              Indexación
+            </th>
+            <th *ngIf="showCols.domicilio" (click)="sortBy('domicilio_tipo')">
+              Tipo Domicilio
+            </th>
+            <th *ngIf="showCols.estado" (click)="sortBy('estado_pago')">
+              Estado
+            </th>
+            <th *ngIf="showCols.notas">Notas</th>
+            <th *ngIf="showCols.mes" (click)="sortBy('mes')">Mes</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-click" *ngFor="let r of rows" (click)="openDetail(r)">
+            <td>{{ r.propietario }}</td>
+            <td>{{ r.inquilino }}</td>
+            <td>{{ r.fecha_alta_contrato || "-" }}</td>
+            <td>{{ r.direccion }}</td>
+            <td>
+              {{
+                r.alquiler_prop != null
+                  ? (r.alquiler_prop | number : "1.0-0")
+                  : "-"
+              }}
+            </td>
+            <td>
+              {{ r.adm != null ? (r.adm | number : "1.0-0") : "-" }}
+            </td>
+            <td *ngIf="showCols.adm_text">{{ r.adm_text || "" }}</td>
+            <td>
+              {{
+                r.neto_propietario != null
+                  ? (r.neto_propietario | number : "1.0-0")
+                  : "-"
+              }}
+            </td>
+            <td *ngIf="showCols.cambiaMonto">
+              {{ r.vencimiento_montos || "-" }}
+            </td>
+            <td *ngIf="showCols.pagoInq">
+              {{ r.fecha_pago_inquilino || "-" }}
+            </td>
+            <td *ngIf="showCols.finContrato && showVencMontoCol">
+              {{ r.venc_monto || "-" }}
+            </td>
+            <td *ngIf="showCols.indexacion">{{ r.indexacion_tipo || "-" }}</td>
+            <td *ngIf="showCols.domicilio">{{ r.domicilio_tipo || "-" }}</td>
+            <td *ngIf="showCols.estado">
+              <span
+                class="pill"
+                [class.warn]="
+                  (r.estado_pago_clean || r.estado_pago || '').toLowerCase() ===
+                  'pendiente'
+                "
+              >
+                {{ r.estado_pago_clean || r.estado_pago || "-" }}
+              </span>
+              <ng-container
+                *ngIf="
+                  (r.estado_pago_clean || '').toLowerCase() === 'pendiente' &&
+                  r.pendiente_pagado
+                "
+              >
+                · pagó {{ r.pendiente_pagado | number : "1.2-2" }}
+                <ng-container *ngIf="r.alquiler_prop">
+                  · debe
+                  {{ r.alquiler_prop - r.pendiente_pagado | number : "1.2-2" }}
+                </ng-container>
+              </ng-container>
+            </td>
+            <td *ngIf="showCols.notas">{{ r.notas || "" }}</td>
+            <td *ngIf="showCols.mes">{{ r.mes }}</td>
+            <td>
+              <button (click)="openEdit(r); $event.stopPropagation()">
+                Editar
+              </button>
+              <button (click)="eliminar(r); $event.stopPropagation()">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p *ngIf="!rows.length && !loading && !errorMsg">
+      No hay registros para mostrar.
+    </p>
+  </section>
+</div>
+
+<!-- ============== MODAL: DETALLE ============== -->
+<div class="overlay" *ngIf="detailOpen" (click)="closeDetail()"></div>
+<div
+  class="modal modal-detail"
+  *ngIf="detailOpen"
+  (click)="$event.stopPropagation()"
+  role="dialog"
+  aria-modal="true"
+>
+  <button class="modal-close" (click)="closeDetail()" aria-label="Cerrar">
+    ×
+  </button>
+  <h4>Detalle de alquiler #{{ detailRow?.id }}</h4>
+
+  <div class="modal-header-actions" style="margin: 6px 0 12px">
+    <button class="btn-secondary" (click)="printDetail($event)">
+      🖨 Imprimir detalle
+    </button>
+  </div>
+
+  <div class="detail-grid">
+    <div><strong>Propietario:</strong> {{ detailRow?.propietario }}</div>
+    <div><strong>Inquilino:</strong> {{ detailRow?.inquilino }}</div>
+    <div class="span2">
+      <strong>Dirección:</strong> {{ detailRow?.direccion }}
+    </div>
+    <div>
+      <strong>Alta contrato:</strong>
+      {{ detailRow?.fecha_alta_contrato || "-" }}
+    </div>
+    <div>
+      <strong>Indexación:</strong> {{ detailRow?.indexacion_tipo || "-" }}
+    </div>
+    <div>
+      <strong>Domicilio:</strong> {{ detailRow?.domicilio_tipo || "-" }}
+    </div>
+    <div>
+      <strong>Estado:</strong>
+      {{ detailRow?.estado_pago_clean || detailRow?.estado_pago || "-" }}
+      <ng-container
+        *ngIf="
+          (detailRow?.estado_pago_clean || '').toLowerCase() === 'pendiente' &&
+          detailRow?.pendiente_pagado
+        "
+      >
+        · pagó {{ detailRow?.pendiente_pagado | number : "1.2-2" }}
+        <ng-container *ngIf="detailRow?.alquiler_prop">
+          · debe
+          {{
+            detailRow?.alquiler_prop - detailRow?.pendiente_pagado
+              | number : "1.2-2"
+          }}
+        </ng-container>
+      </ng-container>
+    </div>
+    <div><strong>Mes:</strong> {{ detailRow?.mes }}</div>
+
+    <div>
+      <strong>Alquiler:</strong>
+      {{
+        detailRow?.alquiler_prop != null
+          ? (detailRow?.alquiler_prop | number : "1.2-2")
+          : "-"
+      }}
+    </div>
+    <div>
+      <strong>ADM:</strong>
+      {{ detailRow?.adm != null ? (detailRow?.adm | number : "1.2-2") : "-" }}
+    </div>
+    <div><strong>ADM (texto):</strong> {{ detailRow?.adm_text || "" }}</div>
+    <div>
+      <strong>Neto Prop.:</strong>
+      {{
+        detailRow?.neto_propietario != null
+          ? (detailRow?.neto_propietario | number : "1.2-2")
+          : "-"
+      }}
+    </div>
+
+    <div>
+      <strong>Cambia Monto:</strong>
+      {{ detailRow?.vencimiento_montos || "-" }}
+    </div>
+    <div>
+      <strong>Pago Inquilino:</strong>
+      {{ detailRow?.fecha_pago_inquilino || "-" }}
+    </div>
+    <div>
+      <strong>Finalizacion Contrato:</strong> {{ detailRow?.venc_monto || "-" }}
+    </div>
+
+    <div class="span2">
+      <strong>Notas:</strong> {{ detailRow?.notas || "" }}
+    </div>
+  </div>
+
+  <div class="modal-actions">
+    <button (click)="openEdit(detailRow!)">Editar</button>
+    <button (click)="eliminar(detailRow!)">Eliminar</button>
+  </div>
+</div>
+
+<!-- ============== MODAL: FORM (NUEVO/EDITAR) ============== -->
+<div class="overlay" *ngIf="formOpen" (click)="cancelarForm()"></div>
+<div
+  class="modal modal-form"
+  *ngIf="formOpen"
+  (click)="$event.stopPropagation()"
+  role="dialog"
+  aria-modal="true"
+>
+  <button class="modal-close" (click)="cancelarForm()" aria-label="Cerrar">
+    ×
+  </button>
+  <h4>{{ editingId ? "Editar alquiler" : "Nuevo alquiler" }}</h4>
+
+  <!-- 👇 ÚNICO contenedor que scrollea y contiene TODAS las secciones -->
+  <div class="modal-body">
+    <!-- CONTRATO -->
+    <div class="form-section">
+      <div class="section-title">Contrato</div>
+      <div class="section-grid two-cols">
+        <!-- (todo tu bloque de propietario / inquilino / dirección / mes) -->
+        <!-- AUTOCOMPLETE PROPIETARIO -->
+        <div class="autocomplete field" #propBox>
+          <label class="lbl">Propietario</label>
+          <div class="ac-input">
+            <input
+              type="text"
+              [(ngModel)]="propTerm"
+              (focus)="showPropPanel = true"
+              (input)="onPropTermInput(); showPropPanel = true"
+              (keydown.escape)="showPropPanel = false"
+              (blur)="onPropBlur()"
+              placeholder="Buscar propietario..."
+            />
+            <button
+              type="button"
+              (click)="limpiarProp()"
+              *ngIf="propTerm"
+              class="btn-mini"
+            >
+              x
+            </button>
+            <button type="button" class="btn-mini" (click)="openPropModal()">
+              + Nuevo
+            </button>
+          </div>
+
+          <div class="ac-panel" *ngIf="showPropPanel && propSugs.length">
+            <div
+              class="ac-item"
+              *ngFor="let p of propSugs"
+              (click)="seleccionarProp(p)"
+            >
+              {{ p.nombre }}
+            </div>
+          </div>
+
+          <small class="hint" *ngIf="propietario_nombre">
+            Seleccionado: <strong>{{ propietario_nombre }}</strong>
+            <span class="muted">(ID: {{ propietario_id || "—" }})</span>
+          </small>
+          <small class="hint" *ngIf="propLoading">Buscando...</small>
+        </div>
+
+        <!-- AUTOCOMPLETE INQUILINO -->
+        <div class="autocomplete field" #inqBox>
+          <label class="lbl">Inquilino</label>
+          <div class="ac-input">
+            <input
+              type="text"
+              [(ngModel)]="inqTerm"
+              (focus)="showInqPanel = true"
+              (input)="onInqTermInput(); showInqPanel = true"
+              (keydown.escape)="showInqPanel = false"
+              (blur)="onInqBlur()"
+              placeholder="Buscar inquilino..."
+            />
+            <button
+              type="button"
+              (click)="limpiarInq()"
+              *ngIf="inqTerm"
+              class="btn-mini"
+            >
+              x
+            </button>
+            <button type="button" class="btn-mini" (click)="openInqModal()">
+              + Nuevo
+            </button>
+          </div>
+
+          <div class="ac-panel" *ngIf="showInqPanel && inqSugs.length">
+            <div
+              class="ac-item"
+              *ngFor="let i of inqSugs"
+              (click)="seleccionarInq(i)"
+            >
+              {{ i.nombre }}
+            </div>
+          </div>
+
+          <small class="hint" *ngIf="inquilino_nombre">
+            Seleccionado: <strong>{{ inquilino_nombre }}</strong>
+            <span class="muted">(ID: {{ inquilino_id || "—" }})</span>
+          </small>
+          <small class="hint" *ngIf="inqLoading">Buscando...</small>
+        </div>
+
+        <div class="autocomplete field" #dirBox>
+          <label class="lbl">Dirección</label>
+          <div class="ac-input">
+            <input
+              type="text"
+              [(ngModel)]="dirTerm"
+              (input)="onDirTermInput()"
+              (keydown.escape)="closeDirPanel()"
+              (blur)="onDirBlur()"
+              placeholder="Calle y número"
+            />
+            <button
+              type="button"
+              (click)="limpiarDir()"
+              *ngIf="dirTerm"
+              class="btn-mini"
+            >
+              x
+            </button>
+          </div>
+
+          <div class="ac-panel" *ngIf="showDirPanel && dirSugs.length">
+            <div
+              class="ac-item"
+              *ngFor="let d of dirSugs"
+              (click)="seleccionarDir(d)"
+            >
+              {{ d.direccion }}
+              <span class="muted" *ngIf="d.propietario_nombre"
+                >&nbsp;· {{ d.propietario_nombre }}</span
+              >
+            </div>
+          </div>
+
+          <small class="hint" *ngIf="dirLoading">Buscando...</small>
+        </div>
+
+        <label class="field">
+          <span class="lbl">Mes Inicial</span>
+          <input [(ngModel)]="form.mes" placeholder="MM-YY" />
+          <small class="hint">Ej: 09-25</small>
+        </label>
+
+        <label class="field">
+          <span class="lbl">Mes final (opcional)</span>
+          <input [(ngModel)]="form.mes_fin" placeholder="MM-YY" />
+          <small class="hint"
+            >Mes hasta Cambiar Monto. Ej: 12-25. Si lo dejás vacío, solo crea el
+            mes inicial.</small
+          >
+        </label>
+      </div>
+    </div>
+
+    <!-- MONTOS -->
+    <div class="form-section">
+      <div class="section-title">Montos</div>
+      <div class="section-grid two-cols">
+        <label class="field">
+          <span class="lbl">Alquiler</span>
+          <div class="input-affix">
+            <span class="prefix">$</span>
+            <input type="number" [(ngModel)]="form.alquiler_prop" />
+          </div>
+        </label>
+        <label class="field">
+          <span class="lbl">ADM</span>
+          <div class="input-affix">
+            <span class="prefix">$</span>
+            <input type="number" [(ngModel)]="form.adm" />
+          </div>
+          <small class="hint">Usá la calculadora para estimarlo</small>
+        </label>
+        <label class="field">
+          <span class="lbl">ADM (texto)</span>
+          <input [(ngModel)]="form.adm_text" placeholder="ej: cuota 1/36" />
+        </label>
+        <label class="field">
+          <span class="lbl">Neto Propietario</span>
+          <div class="input-affix">
+            <span class="prefix">$</span>
+            <input type="number" [(ngModel)]="form.neto_propietario" />
+          </div>
+        </label>
+      </div>
+      <div class="inline-tools">
+        <button
+          (click)="openCalc()"
+          class="btn-secondary"
+          [disabled]="!form.alquiler_prop"
+        >
+          Calculadora ADM / Neto
+        </button>
+      </div>
+    </div>
+
+    <!-- FECHAS -->
+    <div class="form-section">
+      <div class="section-title">Fechas</div>
+      <div class="section-grid two-cols">
+        <label class="field">
+          <span class="lbl">Alta contrato</span>
+          <input type="date" [(ngModel)]="form.fecha_alta_contrato" />
+        </label>
+        <label class="field">
+          <span class="lbl">Cambia Monto</span>
+          <input type="date" [(ngModel)]="form.vencimiento_montos" />
+        </label>
+        <label class="field">
+          <span class="lbl">Pago Inquilino</span>
+          <input type="date" [(ngModel)]="form.fecha_pago_inquilino" />
+        </label>
+        <label class="field">
+          <span class="lbl">Finalizacion Contrato</span>
+          <input type="date" [(ngModel)]="form.venc_monto" />
+        </label>
+      </div>
+    </div>
+
+    <!-- OPCIONES -->
+    <div class="form-section">
+      <div class="section-title">Opciones</div>
+      <div class="section-grid two-cols">
+        <label class="field">
+          <span class="lbl">Indexación</span>
+          <select [(ngModel)]="form.indexacion_tipo">
+            <option value="">—</option>
+            <option value="trimestral">Trimestral</option>
+            <option value="cuatrimestral">Cuatrimestral</option>
+            <option value="semestral">Semestral</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="lbl">Domicilio</span>
+          <select [(ngModel)]="form.domicilio_tipo">
+            <option value="">—</option>
+            <option value="privada">Privada</option>
+            <option value="comercial">Comercial</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="lbl">Estado</span>
+          <select [(ngModel)]="form.estado_pago">
+            <option value="">—</option>
+            <option value="Pagado">Pagado</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="No Pagado">No Pagado</option>
+          </select>
+          <label
+            class="field"
+            *ngIf="(form.estado_pago || '').toLowerCase() === 'pendiente'"
+          >
+            <span class="lbl">Pagó (monto)</span>
+            <div class="input-affix">
+              <span class="prefix">$</span>
+              <input
+                type="number"
+                [(ngModel)]="form.pendiente_pagado"
+                min="0"
+                step="0.01"
+              />
+            </div>
+            <small class="hint"
+              >Opcional. Si lo completás, se guardará como
+              “pendiente:importe”.</small
+            >
+          </label>
+        </label>
+        <label class="field span2">
+          <span class="lbl">Notas</span>
+          <textarea
+            rows="2"
+            [(ngModel)]="form.notas"
+            placeholder="Observaciones..."
+          ></textarea>
+        </label>
+      </div>
+    </div>
+  </div>
+  <!-- /modal-body -->
+
+  <div class="form-actions">
+    <span class="grow"></span>
+    <button (click)="guardar()" class="btn-primary">
+      {{ editingId ? "Guardar cambios" : "Crear" }}
+    </button>
+    <button (click)="cancelarForm()">Cancelar</button>
+  </div>
+</div>
+
+<!-- ============== MODAL: NUEVO PROPIETARIO ============== -->
+<div class="overlay" *ngIf="showPropModal" (click)="closePropModal()"></div>
+<div
+  class="modal"
+  *ngIf="showPropModal"
+  (click)="$event.stopPropagation()"
+  role="dialog"
+  aria-modal="true"
+>
+  <button class="modal-close" (click)="closePropModal()" aria-label="Cerrar">
+    ×
+  </button>
+  <h4>Nuevo propietario</h4>
+  <div class="modal-grid">
+    <label>Nombre <input [(ngModel)]="propNew.nombre" /></label>
+    <label>Teléfono <input [(ngModel)]="propNew.telefono" /></label>
+    <label>Email <input [(ngModel)]="propNew.email" /></label>
+  </div>
+  <p class="msg err" *ngIf="modalError">{{ modalError }}</p>
+  <div class="modal-actions">
+    <button (click)="savePropModal()" [disabled]="savingProp">
+      {{ savingProp ? "Guardando..." : "Crear" }}
+    </button>
+    <button (click)="closePropModal()">Cancelar</button>
+  </div>
+</div>
+
+<!-- ============== MODAL: NUEVO INQUILINO ============== -->
+<div class="overlay" *ngIf="showInqModal" (click)="closeInqModal()"></div>
+<div
+  class="modal"
+  *ngIf="showInqModal"
+  (click)="$event.stopPropagation()"
+  role="dialog"
+  aria-modal="true"
+>
+  <button class="modal-close" (click)="closeInqModal()" aria-label="Cerrar">
+    ×
+  </button>
+  <h4>Nuevo inquilino</h4>
+  <div class="modal-grid">
+    <label>Nombre <input [(ngModel)]="inqNew.nombre" /></label>
+    <label>DNI/CUIT <input [(ngModel)]="inqNew.dni_cuit" /></label>
+    <label>Teléfono <input [(ngModel)]="inqNew.telefono" /></label>
+    <label>Email <input [(ngModel)]="inqNew.email" /></label>
+  </div>
+  <p class="msg err" *ngIf="modalError">{{ modalError }}</p>
+  <div class="modal-actions">
+    <button (click)="saveInqModal()" [disabled]="savingInq">
+      {{ savingInq ? "Guardando..." : "Crear" }}
+    </button>
+    <button (click)="closeInqModal()">Cancelar</button>
+  </div>
+</div>
+
+<!-- ============== MODAL: CALCULADORA ============== -->
+<div class="overlay" *ngIf="showCalc" (click)="closeCalc()"></div>
+<div
+  class="modal"
+  *ngIf="showCalc"
+  (click)="$event.stopPropagation()"
+  role="dialog"
+  aria-modal="true"
+>
+  <button class="modal-close" (click)="closeCalc()" aria-label="Cerrar">
+    ×
+  </button>
+  <h4>Calculadora ADM / Neto</h4>
+
+  <div class="calc-section">
+    <div class="calc-row">
+      <label class="radio-row">
+        <input
+          type="radio"
+          [(ngModel)]="calcMode"
+          value="porcentaje"
+          (change)="recomputeCalc()"
+        />
+        ADM = Alquiler ×
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          [(ngModel)]="calcPorcentaje"
+          (input)="recomputeCalc()"
+          style="width: 90px"
+        />
+        %
+      </label>
+    </div>
+
+    <div class="calc-row">
+      <label class="radio-row">
+        <input
+          type="radio"
+          [(ngModel)]="calcMode"
+          value="monto"
+          (change)="recomputeCalc()"
+        />
+        ADM =
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          [(ngModel)]="calcMonto"
+          (input)="recomputeCalc()"
+          style="width: 120px"
+        />
+      </label>
+    </div>
+
+    <div class="calc-row">
+      <label class="radio-row">
+        <input
+          type="radio"
+          [(ngModel)]="calcMode"
+          value="sin"
+          (change)="recomputeCalc()"
+        />
+        Sin cálculo (ADM = 0)
+      </label>
+    </div>
+  </div>
+
+  <div class="calc-preview">
+    <div>
+      <strong>Alquiler:</strong> {{ calcPreview.alquiler | number : "1.2-2" }}
+    </div>
+    <div><strong>ADM:</strong> {{ calcPreview.adm | number : "1.2-2" }}</div>
+    <div>
+      <strong>Neto Propietario = Alquiler - ADM:</strong>
+      {{ calcPreview.neto | number : "1.2-2" }}
+    </div>
+  </div>
+
+  <div class="modal-actions">
+    <button (click)="applyCalc()" [disabled]="!form.alquiler_prop">
+      Usar estos valores
+    </button>
+    <button (click)="closeCalc()">Cancelar</button>
+  </div>
+</div>
+<div class="overlay" *ngIf="postCreateOpen" (click)="closePostCreate()"></div>
+<div
+  class="modal"
+  *ngIf="postCreateOpen"
+  (click)="$event.stopPropagation()"
+  role="dialog"
+  aria-modal="true"
+>
+  <button class="modal-close" (click)="closePostCreate()" aria-label="Cerrar">
+    ×
+  </button>
+  <h4>¡Alquiler ingresado correctamente!</h4>
+
+  <p class="muted" style="margin-top: -6px">
+    Podés notificar por email al propietario, al inquilino o a ambos.
+  </p>
+
+  <div class="form-section">
+    <div class="section-title">Destinatarios detectados</div>
+    <div class="section-grid two-cols">
+      <label class="field">
+        <span class="lbl">Propietario</span>
+        <input [value]="postCreateInfo.propietario_nombre || '—'" disabled />
+        <small class="hint"
+          >Email: {{ postCreateInfo.propietario_email || "—" }}</small
+        >
+      </label>
+      <label class="field">
+        <span class="lbl">Inquilino</span>
+        <input [value]="postCreateInfo.inquilino_nombre || '—'" disabled />
+        <small class="hint"
+          >Email: {{ postCreateInfo.inquilino_email || "—" }}</small
+        >
+      </label>
+    </div>
+  </div>
+  <div class="modal-actions">
+    <button (click)="openEmailSimple('prop')" [disabled]="false">
+      Email a propietario
+    </button>
+    <button (click)="openEmailSimple('inq')" [disabled]="false">
+      Email a inquilino
+    </button>
+    <button (click)="openEmailBoth()" [disabled]="false">Email a ambos</button>
+    <span class="grow"></span>
+    <button (click)="closePostCreate()">Cerrar</button>
+  </div>
+</div>
+<!-- EMAIL SIMPLE -->
+<div class="overlay" *ngIf="emailOpen" (click)="emailOpen = false"></div>
+<div
+  class="modal modal-mail"
+  *ngIf="emailOpen"
+  (click)="$event.stopPropagation()"
+>
+  <button class="modal-close" (click)="emailOpen = false">×</button>
+  <h4>Enviar email</h4>
+
+  <!-- 👇 ahora scrollea este bloque -->
+  <div class="modal-body">
+    <p class="subtitle">Completá los datos del destinatario y el contenido.</p>
+
+    <!-- Destinatario -->
+    <div class="form-section">
+      <div class="section-title">Destinatario</div>
+      <div class="section-grid two-cols">
+        <label class="field">
+          <span class="lbl">Para (email)</span>
+          <input
+            [(ngModel)]="emailForm.to_email"
+            type="email"
+            placeholder="destinatario@correo.com"
+          />
+          <small class="hint"
+            >Usá un email válido (ej.: nombre&#64;dominio.com)</small
+          >
+        </label>
+
+        <label class="field">
+          <span class="lbl">Nombre (opcional)</span>
+          <input
+            [(ngModel)]="emailForm.to_name"
+            placeholder="Nombre del destinatario"
+          />
+          <small class="hint">Se mostrará en el saludo del mensaje</small>
+        </label>
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="form-section">
+      <div class="section-title">Contenido</div>
+      <div class="section-grid">
+        <label class="field">
+          <span class="lbl">Asunto</span>
+          <input
+            [(ngModel)]="emailForm.subject"
+            placeholder="Información de su alquiler"
+          />
+        </label>
+
+        <label class="field">
+          <span class="lbl">Mensaje (HTML)</span>
+          <textarea
+            [(ngModel)]="emailForm.body_html"
+            rows="10"
+            placeholder="<p>Hola...</p>"
+          ></textarea>
+          <small class="hint">
+            Podés usar etiquetas HTML básicas: &lt;p&gt;, &lt;br&gt;,
+            &lt;strong&gt;, &lt;em&gt;
+          </small>
+        </label>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="section-title">Adjuntos</div>
+      <div class="section-grid">
+        <label class="field">
+          <span class="lbl">Archivos</span>
+          <input type="file" multiple (change)="onEmailFilesSelected($event)" />
+          <small class="hint"
+            >Se permiten varios (límite práctico SMTP ~20 MB total).</small
+          >
+        </label>
+
+        <div *ngIf="emailAttachments.length" class="attachments-list">
+          <div
+            class="att-item"
+            *ngFor="let f of emailAttachments; let i = index"
+          >
+            <span>{{ f.name }} ({{ f.size | number }} bytes)</span>
+            <button class="btn-mini" (click)="removeEmailAttachment(i)">
+              Quitar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-actions">
+    <button
+      (click)="sendEmailSimple()"
+      class="btn-primary btn-flex"
+      [disabled]="emailSending"
+    >
+      <ng-container *ngIf="!emailSending; else sendingSimpleTpl">
+        Enviar
+      </ng-container>
+    </button>
+    <button (click)="emailOpen = false" [disabled]="emailSending">
+      Cancelar
+    </button>
+  </div>
+  <ng-template #sendingSimpleTpl>
+    <span class="spinner spinner--sm" aria-hidden="true"></span>
+    <span class="btn-text">Enviando…</span>
+  </ng-template>
+</div>
+
+<!-- ============== MODAL: EMAIL DOBLE (ambos) ============== -->
+<div
+  class="overlay"
+  *ngIf="emailBothOpen"
+  (click)="emailBothOpen = false"
+></div>
+<div
+  class="modal modal-mail"
+  *ngIf="emailBothOpen"
+  (click)="$event.stopPropagation()"
+>
+  <button class="modal-close" (click)="emailBothOpen = false">×</button>
+  <h4>Enviar email a propietario e inquilino</h4>
+
+  <!-- 👇 ahora scrollea este bloque -->
+  <div class="modal-body">
+    <p class="subtitle">Podés completar uno o ambos destinatarios.</p>
+
+    <!-- Destinatarios -->
+    <div class="form-section">
+      <div class="section-title">Destinatarios</div>
+      <div class="section-grid two-cols">
+        <label class="field">
+          <span class="lbl">Propietario (email)</span>
+          <input
+            [(ngModel)]="emailBothForm.prop_email"
+            type="email"
+            placeholder="propietario@correo.com"
+          />
+          <small class="hint">Dejalo vacío si no querés enviarle</small>
+        </label>
+
+        <label class="field">
+          <span class="lbl">Propietario (nombre)</span>
+          <input
+            [(ngModel)]="emailBothForm.prop_name"
+            placeholder="Nombre del propietario"
+          />
+        </label>
+
+        <label class="field">
+          <span class="lbl">Inquilino (email)</span>
+          <input
+            [(ngModel)]="emailBothForm.inq_email"
+            type="email"
+            placeholder="inquilino@correo.com"
+          />
+          <small class="hint">Dejalo vacío si no querés enviarle</small>
+        </label>
+
+        <label class="field">
+          <span class="lbl">Inquilino (nombre)</span>
+          <input
+            [(ngModel)]="emailBothForm.inq_name"
+            placeholder="Nombre del inquilino"
+          />
+        </label>
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="form-section">
+      <div class="section-title">Contenido</div>
+      <div class="section-grid">
+        <label class="field">
+          <span class="lbl">Asunto</span>
+          <input
+            [(ngModel)]="emailBothForm.subject"
+            placeholder="Información del alquiler"
+          />
+        </label>
+
+        <label class="field">
+          <span class="lbl">Mensaje (HTML)</span>
+          <textarea
+            [(ngModel)]="emailBothForm.body_html"
+            rows="10"
+            placeholder="<p>Hola...</p>"
+          ></textarea>
+          <small class="hint">Se enviará el mismo mensaje a ambos</small>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-title">Adjuntos</div>
+      <div class="section-grid">
+        <label class="field">
+          <span class="lbl">Archivos</span>
+          <input
+            type="file"
+            multiple
+            (change)="onEmailBothFilesSelected($event)"
+          />
+          <small class="hint">Se enviarán a ambos destinatarios.</small>
+        </label>
+
+        <div *ngIf="emailBothAttachments.length" class="attachments-list">
+          <div
+            class="att-item"
+            *ngFor="let f of emailBothAttachments; let i = index"
+          >
+            <span>{{ f.name }} ({{ f.size | number }} bytes)</span>
+            <button class="btn-mini" (click)="removeEmailBothAttachment(i)">
+              Quitar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-actions">
+    <button
+      (click)="sendEmailBoth()"
+      class="btn-primary btn-flex"
+      [disabled]="emailBothSending"
+    >
+      <ng-container *ngIf="!emailBothSending; else sendingBothTpl">
+        Enviar
+      </ng-container>
+    </button>
+    <button (click)="emailBothOpen = false" [disabled]="emailBothSending">
+      Cancelar
+    </button>
+  </div>
+  <ng-template #sendingBothTpl>
+    <span class="spinner spinner--sm" aria-hidden="true"></span>
+    <span class="btn-text">Enviando…</span>
+  </ng-template>
+</div>

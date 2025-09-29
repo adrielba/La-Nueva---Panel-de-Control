@@ -1,0 +1,303 @@
+<div class="propietarios-page">
+  <section class="card">
+    <h3>Propietarios</h3>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="filters">
+        <label>Búsqueda</label>
+        <input
+          type="text"
+          [(ngModel)]="q"
+          placeholder="Nombre / CUIT / Email"
+          (keyup.enter)="applyFilters()"
+        />
+        <button (click)="applyFilters()" class="btn-outline">Filtrar</button>
+        <button (click)="clearFilters()" class="btn-secondary">Limpiar</button>
+      </div>
+
+      <div class="page-size">
+        <label>Mostrar</label>
+        <select [(ngModel)]="pageSize" (change)="changePageSize()">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+        <span>por página</span>
+      </div>
+      <div class="paginator">
+        <button (click)="prevPage()" [disabled]="page === 1">Anterior</button>
+        <span>Página {{ page }} de {{ totalPages }}</span>
+        <button (click)="nextPage()" [disabled]="page >= totalPages">
+          Siguiente
+        </button>
+      </div>
+
+      <div class="print-actions">
+        <button class="btn-secondary" (click)="printAllPropietarios()">
+          🖨 Imprimir lista (completa)
+        </button>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="actions">
+      <button (click)="nuevo()">+ Nuevo propietario</button>
+    </div>
+
+    <!-- Mensajes -->
+    <p class="msg err" *ngIf="errorMsg">{{ errorMsg }}</p>
+    <p class="msg" *ngIf="loading">
+      <span class="spinner"></span>
+      Cargando...
+    </p>
+
+    <!-- Form (crear/editar) -->
+    <div class="form-card" *ngIf="showForm">
+      <h4>{{ editingId ? "Editar propietario" : "Nuevo propietario" }}</h4>
+      <div class="grid">
+        <label>Nombre <input [(ngModel)]="form.nombre" /></label>
+        <label>CUIT/CUIL <input [(ngModel)]="form.cuit_cuil" /></label>
+        <label>Teléfono <input [(ngModel)]="form.telefono" /></label>
+        <label>Email <input [(ngModel)]="form.email" /></label>
+        <label>Alias bancario <input [(ngModel)]="form.banco_alias" /></label>
+        <label>Notas <input [(ngModel)]="form.notas" /></label>
+      </div>
+      <div class="form-actions">
+        <button (click)="guardar()">
+          {{ editingId ? "Guardar cambios" : "Crear" }}
+        </button>
+        <button (click)="cancelar()">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-wrapper" *ngIf="rows.length">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>CUIT/CUIL</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Alias bancario</th>
+            <th>Notas</th>
+            <th>Propiedades</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of rows" (click)="verDetalle(r)" class="row-click">
+            <td class="truncate">{{ r.nombre }}</td>
+            <td>{{ r.cuit_cuil }}</td>
+            <td>{{ r.telefono }}</td>
+            <td>{{ r.email }}</td>
+            <td>{{ r.banco_alias }}</td>
+            <td class="truncate">{{ r.notas }}</td>
+            <td>{{ r.propiedades || 0 }}</td>
+            <td>
+              <button (click)="editar(r); $event.stopPropagation()">
+                Editar
+              </button>
+              <button (click)="eliminar(r); $event.stopPropagation()">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p *ngIf="!rows.length && !loading && !errorMsg">
+      No hay registros para mostrar.
+    </p>
+  </section>
+</div>
+
+<!-- ============== OVERLAY: DETALLE PROPIETARIO ============== -->
+<div class="overlay" *ngIf="detailOpen" (click)="closeDetail()"></div>
+<div
+  class="modal modal-detail"
+  *ngIf="detailOpen"
+  (click)="$event.stopPropagation()"
+  role="dialog"
+  aria-modal="true"
+>
+  <button class="modal-close" (click)="closeDetail()" aria-label="Cerrar">
+    ×
+  </button>
+
+  <h4>Propietario: {{ detalle?.propietario?.nombre }}</h4>
+  <div class="modal-header-actions" style="margin: 6px 0 12px">
+    <button class="btn-secondary" (click)="printPropietarioDetail($event)">
+      🖨 Imprimir
+    </button>
+  </div>
+  <p class="muted">
+    CUIT: {{ detalle?.propietario?.cuit_cuil || "-" }} · Email:
+    {{ detalle?.propietario?.email || "-" }} · Tel:
+    {{ detalle?.propietario?.telefono || "-" }} · Alias:
+    {{ detalle?.propietario?.banco_alias || "-" }}
+  </p>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button [class.active]="tab === 'detalle'" (click)="setTab('detalle')">
+      Detalle
+    </button>
+    <button
+      [class.active]="tab === 'propiedades'"
+      (click)="setTab('propiedades')"
+    >
+      Propiedades
+    </button>
+  </div>
+
+  <!-- TAB: Detalle -->
+  <ng-container *ngIf="tab === 'detalle'">
+    <div class="grid">
+      <div>
+        <strong>CUIT/CUIL:</strong> {{ detalle?.propietario?.cuit_cuil || "—" }}
+      </div>
+      <div>
+        <strong>Teléfono:</strong> {{ detalle?.propietario?.telefono || "—" }}
+      </div>
+      <div class="span2">
+        <strong>Email:</strong> {{ detalle?.propietario?.email || "—" }}
+      </div>
+      <div class="span2">
+        <strong>Alias bancario:</strong>
+        {{ detalle?.propietario?.banco_alias || "—" }}
+      </div>
+      <div class="span2">
+        <strong>Notas:</strong> {{ detalle?.propietario?.notas || "" }}
+      </div>
+    </div>
+    <div class="modal-actions">
+      <span class="grow"></span>
+      <button
+        class="btn-primary"
+        (click)="
+          openEmail(
+            detalle?.propietario?.email || '',
+            detalle?.propietario?.nombre || ''
+          )
+        "
+      >
+        Enviar email
+      </button>
+      <button (click)="closeDetail()">Cerrar</button>
+    </div>
+  </ng-container>
+
+  <!-- TAB: Propiedades (agrupadas) -->
+  <ng-container *ngIf="tab === 'propiedades'">
+    <div class="table-wrapper" *ngIf="props?.length; else noProps">
+      <table>
+        <thead>
+          <tr>
+            <th>Dirección</th>
+            <th>Tipo de domicilio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of props">
+            <td class="truncate">{{ p.direccion }}</td>
+            <td>
+              <span
+                class="badge"
+                [class.badge--comercial]="p.domicilio_tipo === 'comercial'"
+                [class.badge--privado]="p.domicilio_tipo === 'privado'"
+                [class.badge--nulo]="p.domicilio_tipo === 'nulo'"
+              >
+                {{ p.domicilio_tipo }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noProps>
+      <p>No hay propiedades registradas.</p>
+    </ng-template>
+
+    <div class="modal-actions">
+      <button (click)="closeDetail()">Cerrar</button>
+    </div>
+  </ng-container>
+</div>
+
+<div class="overlay" *ngIf="emailOpen" (click)="emailOpen = false"></div>
+<div class="modal" *ngIf="emailOpen" (click)="$event.stopPropagation()">
+  <button class="modal-close" (click)="emailOpen = false">×</button>
+  <h4>Enviar email al propietario</h4>
+
+  <div class="grid" style="grid-template-columns: 1fr 1fr">
+    <label>
+      Para (email)
+      <input
+        [(ngModel)]="emailForm.to_email"
+        placeholder="propietario@email.com"
+      />
+    </label>
+    <label>
+      Nombre (opcional)
+      <input
+        [(ngModel)]="emailForm.to_name"
+        placeholder="Nombre del propietario"
+      />
+    </label>
+    <label class="span2">
+      Asunto
+      <input [(ngModel)]="emailForm.subject" />
+    </label>
+    <label class="span2">
+      Mensaje (HTML)
+      <textarea [(ngModel)]="emailForm.body_html" rows="10"></textarea>
+    </label>
+  </div>
+  <div class="grid span2" style="grid-template-columns: 1fr">
+    <label class="span2">
+      Adjuntos
+      <input type="file" multiple (change)="onPropEmailFilesSelected($event)" />
+      <small class="hint"
+        >Podés adjuntar varios (límite aprox. 18 MB total).</small
+      >
+    </label>
+
+    <div *ngIf="propEmailAttachments.length" class="attachments-list">
+      <div
+        class="att-item"
+        *ngFor="let f of propEmailAttachments; let i = index"
+      >
+        <span>{{ f.name }} ({{ f.size | number }} bytes)</span>
+        <button
+          type="button"
+          class="btn-mini"
+          (click)="removePropEmailAttachment(i)"
+        >
+          Quitar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-actions">
+    <span class="grow"></span>
+    <button
+      class="btn-primary btn-flex"
+      (click)="sendEmail()"
+      [disabled]="emailSending"
+    >
+      <ng-container *ngIf="!emailSending; else sendingTpl">Enviar</ng-container>
+    </button>
+    <button (click)="emailOpen = false" [disabled]="emailSending">
+      Cancelar
+    </button>
+  </div>
+
+  <ng-template #sendingTpl>
+    <span class="spinner spinner--sm" aria-hidden="true"></span>
+    <span class="btn-text">Enviando…</span>
+  </ng-template>
+</div>

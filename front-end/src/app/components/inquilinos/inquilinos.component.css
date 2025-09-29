@@ -1,0 +1,561 @@
+/* ========== Layout de página ========== */
+.inquilinos-page {
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+/* Tarjeta / contenedor principal */
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 14px;
+  background: #fafafa;
+}
+
+/* Toolbar y filtros */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.filters,
+.page-size {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Acciones */
+.actions {
+  margin: 10px 0;
+}
+
+/* Tabla */
+.table-wrapper {
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+th,
+td {
+  border-bottom: 1px solid #f1f3f5;
+  padding: 8px;
+  text-align: left;
+}
+thead th {
+  background: #f8fafc;
+  font-weight: 700;
+}
+.truncate {
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Form (crear/editar) si lo usás en la página (no overlay) */
+.form-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+  margin-bottom: 12px;
+}
+.form-card .grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 10px;
+}
+.form-card label {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  gap: 4px;
+}
+.form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Mensajes y paginador */
+.msg.err {
+  color: #c00;
+}
+.paginator {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+}
+.paginator.top {
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+.paginator.top button {
+  background: transparent;
+  border-color: #c7d2fe;
+  border-radius: 1px;
+  color: #1f2937;
+  padding: 10px;
+}
+.paginator.top button:hover {
+  background: #e0e7ff;
+}
+
+/* Interacción fila */
+.row-click {
+  cursor: pointer;
+}
+.row-click:hover {
+  background: #f7faff;
+}
+
+/* ========== Overlay y modal (comparten look con Propietarios) ========== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+}
+
+/* Modal base: rejilla header/body/footer */
+.modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  z-index: 1001;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  padding: 14px;
+  width: min(900px, 96vw);
+  max-height: 92vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto; /* header / body (scrollea) / footer */
+  overflow: hidden; /* el scroll vive en .modal-body */
+}
+.modal-detail {
+  width: min(1000px, 96vw);
+}
+
+.modal h4 {
+  margin: 0 0 6px;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+  padding-top: 2px;
+  padding-bottom: 8px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 50;
+  background: transparent;
+  border: 0;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+/* CUERPO SCROLLEABLE (único scroll del modal) */
+.modal-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 6px; /* separa del scrollbar */
+  min-height: 0; /* clave cuando el padre es grid/flex */
+}
+
+/* Footer fijo y botones abajo a la derecha */
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 10px;
+  margin-top: 12px;
+  z-index: 2;
+  box-shadow: 0 -6px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* Tabla dentro del modal (opcional) */
+.modal .table-wrapper {
+  max-height: none; /* deja que scrollee el body */
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+.modal .table-wrapper thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f8fafc;
+}
+.modal .truncate {
+  max-width: 360px;
+}
+
+/* Grid genérico usado en overlays */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 10px;
+}
+.grid .span2 {
+  grid-column: span 2;
+}
+
+/* Inputs del overlay de edición */
+.modal input[type="text"],
+.modal input[type="email"],
+.modal input[type="tel"],
+.modal input[type="number"],
+.modal textarea {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+}
+.modal input:focus,
+.modal textarea:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.35);
+}
+
+/* Email modal: textarea más cómodo */
+.modal textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+/* Scrollbar sutil dentro del body */
+.modal-body::-webkit-scrollbar {
+  width: 10px;
+}
+.modal-body::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 8px;
+}
+.modal-body::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 8px;
+  border: 2px solid #f3f4f6;
+}
+
+/* Domicilios: mostrar completos (sin ellipsis) */
+.modal.modal-detail .dom-item {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+/* ===== Botones – sistema coherente ===== */
+
+/* Reset suave para todos los <button> del módulo */
+.inquilinos-page button {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+/* Base */
+.inquilinos-page .btn,
+.inquilinos-page .toolbar button,
+.inquilinos-page .actions button,
+.inquilinos-page .modal-actions button,
+.inquilinos-page table td button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  min-height: 36px;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #111827;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease, transform 0.04s ease;
+}
+
+.inquilinos-page .toolbar button:hover,
+.inquilinos-page .actions button:hover,
+.inquilinos-page .modal-actions button:hover,
+.inquilinos-page table td button:hover {
+  background: #eef2ff;
+  border-color: #dbeafe;
+}
+
+.inquilinos-page .toolbar button:active,
+.inquilinos-page .actions button:active,
+.inquilinos-page .modal-actions button:active,
+.inquilinos-page table td button:active {
+  transform: translateY(1px);
+}
+
+/* Enfoque accesible */
+.inquilinos-page .toolbar button:focus-visible,
+.inquilinos-page .actions button:focus-visible,
+.inquilinos-page .modal-actions button:focus-visible,
+.inquilinos-page table td button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.45);
+  border-color: #93c5fd;
+}
+
+/* Deshabilitado */
+.inquilinos-page button[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Variantes */
+.inquilinos-page .btn-primary,
+.inquilinos-page .actions button.btn-primary,
+.inquilinos-page .modal-actions button.btn-primary {
+  background: #1e88e5;
+  border-color: #1e88e5;
+  color: #fff;
+}
+.inquilinos-page .btn-primary:hover {
+  background: #1565c0;
+  border-color: #1565c0;
+}
+
+.inquilinos-page .btn-secondary {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #111827;
+}
+.inquilinos-page .btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+.inquilinos-page .btn-outline {
+  background: transparent;
+  border-color: #c7d2fe;
+  color: #1f2937;
+}
+.inquilinos-page .btn-outline:hover {
+  background: #eef2ff;
+  border-color: #93c5fd;
+}
+
+.inquilinos-page .btn-danger {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+}
+.inquilinos-page .btn-danger:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.inquilinos-page .btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: #1e40af;
+}
+.inquilinos-page .btn-ghost:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.inquilinos-page .btn-flex {
+  display: inline-flex;
+  gap: 8px;
+}
+
+/* Tamaños */
+.inquilinos-page .btn-sm,
+.inquilinos-page .btn-mini,
+.inquilinos-page table td .btn-mini,
+.inquilinos-page table td button.btn-mini {
+  padding: 4px 8px;
+  min-height: 28px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+.inquilinos-page .btn-lg {
+  padding: 10px 16px;
+  min-height: 42px;
+  font-size: 15px;
+}
+
+/* Botones en tabla: espacio */
+.inquilinos-page table td {
+  white-space: nowrap;
+}
+.inquilinos-page table td .btn-mini + .btn-mini,
+.inquilinos-page table td button + button {
+  margin-left: 6px;
+}
+
+/* Grupo de botones (pegados) */
+.inquilinos-page .btn-group {
+  display: inline-flex;
+}
+.inquilinos-page .btn-group > button {
+  border-radius: 0;
+}
+.inquilinos-page .btn-group > button:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+.inquilinos-page .btn-group > button:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.inquilinos-page .btn-group > button + button {
+  margin-left: -1px;
+}
+
+/* Botón con spinner inline */
+.inquilinos-page .btn .spinner2,
+.inquilinos-page .btn-primary .spinner2 {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+  margin-right: 4px;
+  border-top-color: currentColor;
+}
+
+/* Botón “link” */
+.inquilinos-page .btn-link {
+  background: transparent;
+  border: none;
+  color: #1e40af;
+  font-weight: 600;
+  padding: 0;
+  min-height: auto;
+}
+.inquilinos-page .btn-link:hover {
+  text-decoration: underline;
+}
+
+/* Default para .actions sin variante explícita */
+.inquilinos-page
+  .actions
+  button:not(.btn-secondary):not(.btn-outline):not(.btn-danger) {
+  background: #1e88e5;
+  border-color: #1e88e5;
+  color: #fff;
+}
+.inquilinos-page
+  .actions
+  button:not(.btn-secondary):not(.btn-outline):not(.btn-danger):hover {
+  background: #1565c0;
+  border-color: #1565c0;
+}
+
+/* Botón primario del footer con ancho mínimo */
+.inquilinos-page .modal-actions .btn-primary {
+  min-width: 140px;
+}
+.modal-actions button {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #111827;
+}
+
+/* ===== Botones dentro de MODAL (sin depender de .inquilinos-page) ===== */
+
+/* Base */
+.modal .btn,
+.modal .modal-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  min-height: 36px;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #111827;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease, transform 0.04s ease;
+}
+
+.modal .modal-actions button:hover {
+  background: #eef2ff;
+  border-color: #dbeafe;
+}
+.modal .modal-actions button:active {
+  transform: translateY(1px);
+}
+.modal .modal-actions button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.45);
+  border-color: #93c5fd;
+}
+.modal .modal-actions button[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Variantes */
+.modal .btn-primary,
+.modal .modal-actions .btn-primary,
+.modal .modal-actions button.btn-primary {
+  background: #1e88e5;
+  border-color: #1e88e5;
+  color: #fff;
+}
+.modal .btn-primary:hover,
+.modal .modal-actions .btn-primary:hover,
+.modal .modal-actions button.btn-primary:hover {
+  background: #1565c0;
+  border-color: #1565c0;
+}
+
+.modal .btn-secondary,
+.modal .modal-actions .btn-secondary,
+.modal .modal-actions button.btn-secondary {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #111827;
+}
+.modal .btn-secondary:hover,
+.modal .modal-actions .btn-secondary:hover,
+.modal .modal-actions button.btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+/* Botón primario con ancho mínimo como en el resto */
+.modal .modal-actions .btn-primary {
+  min-width: 140px;
+}

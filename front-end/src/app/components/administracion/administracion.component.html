@@ -1,0 +1,220 @@
+<div class="admin-page">
+  <section class="card">
+    <h3>Logs / Auditoría</h3>
+
+    <div class="toolbar">
+      <div class="filters">
+        <input [(ngModel)]="user" placeholder="Usuario (nombre)" />
+        <select [(ngModel)]="entity">
+          <option value="">— Entidad —</option>
+          <option value="auth">Autenticación</option>
+          <option value="firm_ledger">Caja</option>
+          <option value="alquiler">Alquiler</option>
+          <option value="inquilino">Inquilino</option>
+          <option value="propietario">Propietario</option>
+          <option value="users">Usuarios</option>
+          <!-- agregá las que uses -->
+        </select>
+        <select [(ngModel)]="action">
+          <option value="">— Acción —</option>
+          <option value="login">Ingreso</option>
+          <option value="logout">Salida</option>
+          <option value="create">Creación</option>
+          <option value="update">Actualización</option>
+          <option value="delete">Borrado</option>
+        </select>
+        <input type="date" [(ngModel)]="from" />
+        <input type="date" [(ngModel)]="to" />
+        <button (click)="apply()">Filtrar</button>
+        <button (click)="clear()">Limpiar</button>
+      </div>
+
+      <div class="page-size">
+        <label>Mostrar</label>
+        <select [(ngModel)]="pageSize" (change)="apply()">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+        <span>por página</span>
+      </div>
+      <div class="paginator">
+        <button (click)="prev()" [disabled]="page === 1">Anterior</button>
+        <span>Página {{ page }} de {{ totalPages }}</span>
+        <button (click)="next()" [disabled]="page >= totalPages">
+          Siguiente
+        </button>
+      </div>
+    </div>
+
+    <p *ngIf="loading">Cargando…</p>
+    <p *ngIf="errorMsg" class="err">{{ errorMsg }}</p>
+
+    <div class="table-wrapper" *ngIf="rows.length">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Rol</th>
+            <th>Acción</th>
+            <th>Entidad</th>
+            <th>ID</th>
+            <th>Ruta</th>
+            <th>Detalles</th>
+            <th>IP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of rows">
+            <td>{{ r.ts | date : "yyyy-MM-dd HH:mm:ss" }}</td>
+            <td class="truncate">{{ r.user_name || "—" }}</td>
+            <td>{{ tRole(r.user_role) }}</td>
+            <td>
+              <span class="pill">{{ tAction(r.action) }}</span>
+            </td>
+            <td>{{ tEntity(r.entity) }}</td>
+            <td class="truncate">{{ tRoute(r.route) }}</td>
+            <td class="payload-cell">
+              <div class="clamp" [class.open]="openId === r.id">
+                <pre>{{ r.payload_json || "" }}</pre>
+              </div>
+              <button class="btn-mini" (click)="toggle(r)">
+                {{ openId === r.id ? "Contraer" : "Expandir" }}
+              </button>
+            </td>
+            <td class="truncate">{{ r.ip || "" }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p *ngIf="!rows.length && !loading && !errorMsg">Sin resultados.</p>
+  </section>
+</div>
+<!-- ===================== USUARIOS ===================== -->
+<section class="card" style="margin-top: 24px">
+  <h3>Usuarios</h3>
+
+  <div class="toolbar">
+    <div class="filters">
+      <input [(ngModel)]="u_q" placeholder="Buscar usuario / nombre / rol" />
+      <button (click)="u_apply()">Filtrar</button>
+      <button (click)="u_clear()">Limpiar</button>
+    </div>
+    <div class="page-size">
+      <label>Mostrar</label>
+      <select [(ngModel)]="u_pageSize" (change)="u_apply()">
+        <option [value]="10">10</option>
+        <option [value]="20">20</option>
+        <option [value]="50">50</option>
+      </select>
+      <span>por página</span>
+    </div>
+    <div>
+      <button class="btn-primary" (click)="u_openNew()">+ Nuevo usuario</button>
+    </div>
+  </div>
+
+  <p *ngIf="u_loading">Cargando usuarios…</p>
+  <p *ngIf="u_error" class="err">{{ u_error }}</p>
+
+  <div class="table-wrapper" *ngIf="u_rows.length">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Nombre</th>
+          <th>Rol</th>
+          <th>Contraseña</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of u_rows">
+          <td>{{ u.id }}</td>
+          <td class="truncate">{{ u.username }}</td>
+          <td class="truncate">{{ u.name }}</td>
+          <td>{{ u.role }}</td>
+          <td>
+            <span>••••••</span>
+            <button class="btn-mini" (click)="u_openSetPass(u)">Cambiar</button>
+          </td>
+          <td>
+            <button (click)="u_openEdit(u)">Editar</button>
+            <button class="btn-danger" (click)="u_delete(u)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="paginator">
+      <button (click)="u_prev()" [disabled]="u_page === 1">Anterior</button>
+      <span>Página {{ u_page }} de {{ u_totalPages }}</span>
+      <button (click)="u_next()" [disabled]="u_page >= u_totalPages">
+        Siguiente
+      </button>
+    </div>
+  </div>
+
+  <p *ngIf="!u_rows.length && !u_loading && !u_error">Sin usuarios.</p>
+</section>
+
+<!-- ============ MODAL: NUEVO / EDITAR USUARIO ============ -->
+<div class="overlay" *ngIf="u_editOpen" (click)="u_closeEdit()"></div>
+<div class="modal" *ngIf="u_editOpen" (click)="$event.stopPropagation()">
+  <button class="modal-close" (click)="u_closeEdit()">×</button>
+  <h4>{{ u_editId ? "Editar usuario" : "Nuevo usuario" }}</h4>
+
+  <div class="grid" style="grid-template-columns: 1fr 1fr">
+    <label>Usuario <input [(ngModel)]="u_form.username" /></label>
+    <label>Nombre <input [(ngModel)]="u_form.name" /></label>
+
+    <!-- Rol bloqueado a superadmin al crear; editable pero sin permitir 'master' -->
+    <label class="span2">
+      Rol
+      <select [(ngModel)]="u_form.role" [disabled]="!u_editId">
+        <option value="superadmin">superadmin</option>
+        <!-- No ofrecer 'master' -->
+      </select>
+      <small class="hint" *ngIf="!u_editId"
+        >Al crear siempre será <strong>superadmin</strong>.</small
+      >
+    </label>
+
+    <!-- Solo en ALTA mostramos contraseña -->
+    <label class="span2" *ngIf="!u_editId">
+      Contraseña
+      <input type="password" [(ngModel)]="u_form.password" />
+    </label>
+  </div>
+
+  <div class="modal-actions">
+    <button class="btn-primary" (click)="u_save()">
+      {{ u_editId ? "Guardar cambios" : "Crear" }}
+    </button>
+    <button (click)="u_closeEdit()">Cancelar</button>
+  </div>
+</div>
+
+<!-- ============ MODAL: CAMBIAR CONTRASEÑA ============ -->
+<div class="overlay" *ngIf="u_passOpen" (click)="u_closePass()"></div>
+<div class="modal" *ngIf="u_passOpen" (click)="$event.stopPropagation()">
+  <button class="modal-close" (click)="u_closePass()">×</button>
+  <h4>Cambiar contraseña</h4>
+  <p class="muted">
+    Usuario: <strong>{{ u_target?.username }}</strong>
+  </p>
+
+  <div class="grid">
+    <label class="span2"
+      >Nueva contraseña <input type="password" [(ngModel)]="u_newPass"
+    /></label>
+  </div>
+
+  <div class="modal-actions">
+    <button class="btn-primary" (click)="u_setPass()">Actualizar</button>
+    <button (click)="u_closePass()">Cancelar</button>
+  </div>
+</div>

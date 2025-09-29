@@ -1,0 +1,45 @@
+.days-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  margin: 8px 0 16px;
+}
+
+.days-bar .month-label {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.days-bar .ybtn {
+  border: 1px solid #ddd;
+  background: #fafafa;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.days-bar .days-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 6px;
+  flex: 1;
+}
+
+.days-bar .ditem {
+  min-width: 32px;
+  text-align: center;
+  padding: 6px 0;
+  border-radius: 6px;
+  border: 1px solid #e5e5e5;
+  cursor: pointer;
+  user-select: none;
+}
+
+.days-bar .ditem.active {
+  background: #1e88e5;
+  color: #fff;
+  border-color: #1e88e5;
+}

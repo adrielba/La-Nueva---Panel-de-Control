@@ -1,0 +1,67 @@
+<div class="movs-page">
+  <section class="card">
+    <h3>Movimientos · Propietarios</h3>
+
+    <div class="toolbar">
+      <div class="filters">
+        <input
+          type="text"
+          [(ngModel)]="q"
+          placeholder="Buscar propietario..."
+          (keyup.enter)="apply()"
+        />
+        <button (click)="apply()">Filtrar</button>
+        <button (click)="clear()">Limpiar</button>
+      </div>
+
+      <div class="page-size">
+        <label>Mostrar</label>
+        <select [(ngModel)]="pageSize" (change)="apply()">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+        <span>por página</span>
+      </div>
+    </div>
+    <div class="paginator">
+      <button (click)="prev()" [disabled]="page === 1">Anterior</button>
+      <span>Página {{ page }} de {{ totalPages }}</span>
+      <button (click)="next()" [disabled]="page >= totalPages">
+        Siguiente
+      </button>
+    </div>
+
+    <p class="msg" *ngIf="loading">Cargando...</p>
+    <p class="msg err" *ngIf="errorMsg">{{ errorMsg }}</p>
+
+    <div class="table-wrapper" *ngIf="rows.length">
+      <table>
+        <thead>
+          <tr>
+            <th>Propietario</th>
+            <th>CUIT/CUIL</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of rows" class="row-click">
+            <td class="truncate">{{ r.nombre }}</td>
+            <td>{{ r.cuit_cuil || "—" }}</td>
+            <td>{{ r.telefono || "—" }}</td>
+            <td>{{ r.email || "—" }}</td>
+            <td>
+              <button (click)="openProp(r)">Ver movimientos</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p *ngIf="!rows.length && !loading && !errorMsg">No hay propietarios.</p>
+  </section>
+
+  <app-caja-inmobiliaria></app-caja-inmobiliaria>
+</div>

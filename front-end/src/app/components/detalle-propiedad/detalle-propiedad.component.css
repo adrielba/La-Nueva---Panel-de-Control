@@ -1,0 +1,367 @@
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  padding: 14px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 10px;
+}
+.span2 {
+  grid-column: span 2;
+}
+
+.err {
+  color: #c00;
+}
+.actions {
+  margin-bottom: 8px;
+}
+.btn-back {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  cursor: pointer;
+}
+.btn-back:hover {
+  background: #eef2ff;
+}
+
+/* ===== Bloque Servicios ===== */
+section.card h4 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+/* Toolbar de filtros y acciones */
+section.card .toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+section.card .toolbar .filters input {
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+section.card .toolbar .filters button,
+section.card .toolbar .actions button {
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.2s, color 0.2s;
+}
+
+section.card .toolbar .filters button:hover,
+section.card .toolbar .actions button:hover {
+  background: #f3f4f6;
+}
+
+/* Tabla de servicios */
+section.card .table-wrapper {
+  margin-top: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow-x: auto; /* scroll horizontal si hace falta */
+}
+
+section.card table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+section.card th,
+section.card td {
+  border: 1px solid #e5e7eb;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+section.card th {
+  background: #f9fafb;
+  font-weight: 600;
+}
+
+section.card td.truncate {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Acciones */
+section.card td button {
+  margin-right: 4px;
+  padding: 4px 10px;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  transition: background 0.2s;
+}
+section.card td button:hover {
+  background: #e5e7eb;
+}
+
+section.card td button.btn-primary {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+section.card td button.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+/* Paginador */
+section.card .paginator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+section.card .paginator button {
+  padding: 5px 12px;
+  font-size: 13px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #f3f4f6;
+  cursor: pointer;
+}
+section.card .paginator button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Modal (reutiliza tu overlay/modal existente, solo ajusto inputs) */
+.modal input,
+.modal textarea {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 4px;
+}
+.modal textarea {
+  resize: vertical;
+}
+
+/* ===== Modal de servicio (overlay + panel centrado) ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.45); /* negro translúcido */
+  backdrop-filter: saturate(120%) blur(2px);
+  z-index: 2000;
+  animation: modal-fade-in 120ms ease-out;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  z-index: 2001;
+  width: min(720px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 16px 18px 14px;
+  animation: modal-pop-in 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Título del modal */
+.modal h4 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Botón de cerrar (arriba a la derecha) */
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #111827;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    transform 0.02s ease;
+}
+.modal-close:hover {
+  background: #f9fafb;
+  border-color: #dfe3e6;
+}
+.modal-close:active {
+  transform: translateY(1px);
+}
+.modal-close:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 2px;
+}
+
+/* Inputs dentro del modal (suavizo un poco) */
+.modal input,
+.modal textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-top: 4px;
+  background: #fff;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.modal input:focus,
+.modal textarea:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+.modal textarea {
+  resize: vertical;
+}
+
+/* Grilla del modal */
+.modal .grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.modal .span2 {
+  grid-column: 1 / -1;
+}
+
+/* Acciones del modal */
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 10px;
+  margin-top: 10px;
+  border-top: 1px solid #f1f3f5;
+}
+.modal-actions .grow {
+  flex: 1;
+}
+
+/* Botones dentro del modal */
+.modal .btn-primary,
+.modal button {
+  appearance: none;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #111827;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.02s, background 0.15s,
+    border-color 0.15s;
+}
+.modal button:hover {
+  background: #f9fafb;
+  border-color: #dfe3e6;
+}
+.modal button:active {
+  transform: translateY(1px);
+}
+.modal button:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 1px;
+  border-color: #93c5fd;
+}
+.modal .btn-primary {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+.modal .btn-primary:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+/* Espaciado entre labels en el modal */
+.modal .grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* espacio entre label y input */
+  margin-bottom: 12px; /* espacio entre campos */
+}
+
+/* El campo Notas no toca los bordes */
+.modal .grid label.span2 textarea {
+  width: 95%; /* deja un margen lateral dentro del modal */
+  max-width: 95%; /* evita que se expanda demasiado */
+}
+
+/* Limitar ancho de los inputs en la primera fila */
+.modal .grid label:not(.span2) input {
+  max-width: 280px; /* ajustá este valor según lo que prefieras */
+}
+
+/* Mantenerlos centrados dentro de su columna */
+.modal .grid label {
+  justify-content: flex-start;
+}
+
+/* Animaciones */
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes modal-pop-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Responsive: en pantallas chicas, 1 columna */
+@media (max-width: 600px) {
+  .modal {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+  }
+  .modal .grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,529 @@
+/* ===========================
+   PROPIETARIOS – Estilos base
+   =========================== */
+.propietarios-page {
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+}
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 14px;
+  background: #fafafa;
+}
+
+/* ===== Toolbar / Filtros / Paginador superior ===== */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.filters,
+.page-size,
+.paginator,
+.print-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ===== Acciones (debajo del título) ===== */
+.actions {
+  margin: 10px 0;
+}
+
+/* ===========================
+   Tabla
+   =========================== */
+.table-wrapper {
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+th,
+td {
+  border-bottom: 1px solid #f1f3f5;
+  padding: 8px;
+  text-align: left;
+}
+thead th {
+  background: #f8fafc;
+  font-weight: 700;
+}
+.truncate {
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row-click {
+  cursor: pointer;
+}
+.row-click:hover {
+  background: #f7faff;
+}
+
+/* ===========================
+   Form (crear/editar en página)
+   =========================== */
+.form-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+  margin-bottom: 12px;
+}
+.form-card .grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 10px;
+}
+.form-card label {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  gap: 4px;
+}
+.form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* ===========================
+   Mensajes y paginator
+   =========================== */
+.msg.err {
+  color: #c00;
+}
+.paginator {
+  gap: 10px;
+  padding: 8px 0;
+}
+
+/* ===========================
+   Overlay + Modal (detalle/email)
+   =========================== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+}
+.modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  z-index: 1001;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+  width: min(900px, 96vw);
+  max-height: 92vh;
+  overflow: auto;
+}
+.modal-detail {
+  width: min(1000px, 96vw);
+}
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 50;
+  background: transparent;
+  border: 0;
+  font-size: 18px;
+  cursor: pointer;
+}
+.muted {
+  color: #6b7280;
+}
+
+/* Tabs dentro del modal */
+.tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #e5e7eb;
+  margin: 6px 0 10px;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+}
+.tabs button {
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-bottom: none;
+  background: #f9fafb;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  cursor: pointer;
+}
+.tabs button.active {
+  background: #fff;
+  font-weight: 700;
+}
+
+/* Tabla dentro del modal */
+.modal .table-wrapper {
+  max-height: 70vh;
+  overflow: auto;
+}
+.modal .table-wrapper thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f8fafc;
+}
+.modal .truncate {
+  max-width: 360px;
+}
+
+/* Modal con estructura header/body/footer y scroll interno */
+.modal {
+  max-height: 92vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+.modal h4 {
+  margin: 0 0 6px;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+  padding-top: 2px;
+  padding-bottom: 8px;
+}
+.modal .grid,
+.modal .modal-grid,
+.modal .table-wrapper {
+  overflow: auto;
+  padding-right: 6px;
+}
+
+/* Footer pegado abajo */
+.modal-actions {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 8px;
+  margin-top: 6px;
+  z-index: 2;
+  box-shadow: 0 -6px 10px rgba(0, 0, 0, 0.04);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.modal-actions .grow {
+  flex: 1;
+}
+
+/* Inputs del modal */
+.modal input[type="text"],
+.modal input[type="email"],
+.modal input[type="tel"],
+.modal input[type="number"],
+.modal textarea {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+}
+.modal input:focus,
+.modal textarea:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.35);
+}
+.modal textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+/* Scrollbar sutil */
+.modal .grid::-webkit-scrollbar,
+.modal .modal-grid::-webkit-scrollbar,
+.modal .table-wrapper::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.modal .grid::-webkit-scrollbar-track,
+.modal .modal-grid::-webkit-scrollbar-track,
+.modal .table-wrapper::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 8px;
+}
+.modal .grid::-webkit-scrollbar-thumb,
+.modal .modal-grid::-webkit-scrollbar-thumb,
+.modal .table-wrapper::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 8px;
+  border: 2px solid #f3f4f6;
+}
+
+/* Spinners (reutilizables) */
+.spinner {
+  width: 42px;
+  height: 42px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #1e88e5;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+.spinner--sm {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  vertical-align: middle;
+  border-width: 2px;
+}
+.spinner2 {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  margin-right: 6px;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Badges (propiedades: comercial/privado/nulo) */
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+.badge--comercial {
+  background: #fff7ed;
+  border-color: #fdba74;
+}
+.badge--privado {
+  background: #ecfeff;
+  border-color: #67e8f9;
+}
+.badge--nulo {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #6b7280;
+}
+
+/* ==================================================
+   BOTONES – sistema coherente (scoped al componente)
+   ================================================== */
+
+/* Reset suave */
+.propietarios-page button {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+/* Base */
+.propietarios-page .btn,
+.propietarios-page .toolbar button,
+.propietarios-page .actions button,
+.propietarios-page .form-actions button,
+.propietarios-page .modal-actions button,
+.propietarios-page table td button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  min-height: 36px;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #111827;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease, transform 0.04s ease;
+}
+
+.propietarios-page .toolbar button:hover,
+.propietarios-page .actions button:hover,
+.propietarios-page .form-actions button:hover,
+.propietarios-page .modal-actions button:hover,
+.propietarios-page table td button:hover {
+  background: #eef2ff;
+  border-color: #dbeafe;
+}
+
+.propietarios-page .toolbar button:active,
+.propietarios-page .actions button:active,
+.propietarios-page .form-actions button:active,
+.propietarios-page .modal-actions button:active,
+.propietarios-page table td button:active {
+  transform: translateY(1px);
+}
+
+/* Enfoque accesible */
+.propietarios-page .toolbar button:focus-visible,
+.propietarios-page .actions button:focus-visible,
+.propietarios-page .form-actions button:focus-visible,
+.propietarios-page .modal-actions button:focus-visible,
+.propietarios-page table td button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.45);
+  border-color: #93c5fd;
+}
+
+/* Deshabilitado */
+.propietarios-page button[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ===== Variantes ===== */
+.propietarios-page .btn-primary {
+  background: #1e88e5;
+  border-color: #1e88e5;
+  color: #fff;
+}
+.propietarios-page .btn-primary:hover {
+  background: #1565c0;
+  border-color: #1565c0;
+}
+
+.propietarios-page .btn-secondary {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #111827;
+}
+.propietarios-page .btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+.propietarios-page .btn-outline {
+  background: transparent;
+  border-color: #c7d2fe;
+  color: #1f2937;
+}
+.propietarios-page .btn-outline:hover {
+  background: #eef2ff;
+  border-color: #93c5fd;
+}
+
+.propietarios-page .btn-danger {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+}
+.propietarios-page .btn-danger:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.propietarios-page .btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: #1e40af;
+}
+.propietarios-page .btn-ghost:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+/* Tamaños */
+.propietarios-page .btn-mini,
+.propietarios-page table td .btn-mini,
+.propietarios-page table td button.btn-mini {
+  padding: 4px 8px;
+  min-height: 28px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+.propietarios-page .btn-lg {
+  padding: 10px 16px;
+  min-height: 42px;
+  font-size: 15px;
+}
+
+/* Botones en celdas de tabla */
+.propietarios-page table td {
+  white-space: nowrap;
+}
+.propietarios-page table td .btn-mini + .btn-mini,
+.propietarios-page table td button + button {
+  margin-left: 6px;
+}
+
+/* Grupo de botones */
+.propietarios-page .btn-group {
+  display: inline-flex;
+}
+.propietarios-page .btn-group > button {
+  border-radius: 0;
+}
+.propietarios-page .btn-group > button:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+.propietarios-page .btn-group > button:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.propietarios-page .btn-group > button + button {
+  margin-left: -1px;
+}
+
+/* Botón flexible (spinner + texto) */
+.propietarios-page .btn-flex {
+  display: inline-flex;
+  gap: 8px;
+}
+.propietarios-page .btn .spinner2,
+.propietarios-page .btn-primary .spinner2 {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+  margin-right: 4px;
+  border-top-color: currentColor;
+}
+
+/* CTA por defecto en “acciones” (Nuevo propietario) */
+.propietarios-page
+  .actions
+  button:not(.btn-secondary):not(.btn-outline):not(.btn-danger) {
+  background: #1e88e5;
+  border-color: #1e88e5;
+  color: #fff;
+}
+.propietarios-page
+  .actions
+  button:not(.btn-secondary):not(.btn-outline):not(.btn-danger):hover {
+  background: #1565c0;
+  border-color: #1565c0;
+}

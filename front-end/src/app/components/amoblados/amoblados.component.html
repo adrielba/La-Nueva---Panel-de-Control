@@ -1,0 +1,488 @@
+<div class="alquileres-container">
+  <div class="card toolbar">
+    <div class="actions">
+      <button class="btn-primary" (click)="nuevo()">➕ Nuevo amoblado</button>
+    </div>
+    <div class="filters">
+      <label>Búsqueda</label>
+      <input
+        type="text"
+        [(ngModel)]="q"
+        placeholder="Inquilino / Dirección / Notas o montos"
+        (keyup.enter)="applyFilters()"
+      />
+
+      <div class="days-bar card">
+        <button class="ybtn" (click)="prevDay()">◀</button>
+        <div class="month-label">
+          {{ viewMonth + 1 | number : "2.0-0" }}/{{ viewYear }}
+          <button class="btn-mini" (click)="goToday()">Hoy</button>
+          <button class="ybtn" (click)="nextDay()">▶</button>
+        </div>
+
+        <div class="days-scroll" #daysScroll>
+          <div
+            class="ditem"
+            *ngFor="let d of daysOfMonth"
+            #dayItem
+            [class.active]="isActiveDay(d)"
+            (click)="selectDay(d); centerActive()"
+          >
+            {{ d }}
+          </div>
+        </div>
+      </div>
+
+      <label>Fecha</label>
+      <input type="date" [(ngModel)]="fecha" />
+      <span class="muted">o</span>
+      <input type="date" [(ngModel)]="fFrom" placeholder="Desde" />
+      <input type="date" [(ngModel)]="fTo" placeholder="Hasta" />
+
+      <button (click)="applyFilters()">Filtrar</button>
+      <button class="btn-secondary" (click)="clearFilters()">Limpiar</button>
+    </div>
+
+    <div class="paginator-bar">
+      <div class="paginator inline">
+        <button (click)="prevPage()" [disabled]="page === 1">◀</button>
+        <span class="muted">Página {{ page }}</span>
+        <button (click)="nextPage()">▶</button>
+      </div>
+
+      <div class="page-size compact">
+        <label>Mostrar</label>
+        <select [(ngModel)]="pageSize" (change)="changePageSize()">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card table-wrapper">
+    <table class="amoblados-table">
+      <thead>
+        <tr>
+          <th (click)="sortBy('fecha')">Fecha</th>
+          <th (click)="sortBy('inquilino')">Inquilino</th>
+          <th (click)="sortBy('direccion')">Dirección</th>
+          <th (click)="sortBy('alquiler_prop')">Alquiler</th>
+          <th (click)="sortBy('adm')">ADM</th>
+          <th (click)="sortBy('neto_propietario')">Neto</th>
+          <th (click)="sortBy('fecha_pago_inquilino')">Pago Inq.</th>
+          <th (click)="sortBy('vencimiento')">Vencimiento</th>
+          <th (click)="sortBy('estado_pago')">Estado</th>
+          <th>Notas</th>
+          <th class="nowrap">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of rows" class="row-click" (click)="onRowClick(r)">
+          <td>{{ r.fecha || "-" }}</td>
+          <td>{{ r.inquilino || "-" }}</td>
+          <td class="truncate">{{ r.direccion || "-" }}</td>
+          <td class="nowrap">{{ r.alquiler_prop | number : "1.2-2" }}</td>
+          <td class="nowrap">{{ r.adm | number : "1.2-2" }}</td>
+          <td class="nowrap">{{ r.neto_propietario | number : "1.2-2" }}</td>
+          <td>{{ r.fecha_pago_inquilino || "-" }}</td>
+          <td>{{ r.vencimiento || "-" }}</td>
+          <td>{{ r.estado_pago || "-" }}</td>
+          <td class="truncate">{{ r.notas || "" }}</td>
+          <td class="nowrap">
+            <button
+              class="btn-mini"
+              (click)="editar(r); $event.stopPropagation()"
+            >
+              Editar
+            </button>
+            <button
+              class="btn-mini"
+              (click)="eliminar(r); $event.stopPropagation()"
+            >
+              Eliminar
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && rows.length === 0">
+          <td colspan="10" class="muted">Sin registros.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================== LISTA DE DIRECCIONES (amoblados) ================== -->
+  <div class="card" style="margin-top: 16px">
+    <div class="toolbar">
+      <h3 style="margin: 0">Direcciones de amoblados</h3>
+    </div>
+
+    <div *ngIf="dirsLoading" class="muted" style="padding: 8px">Cargando…</div>
+
+    <div class="table-wrapper">
+      <table class="direccion-table">
+        <thead>
+          <tr>
+            <th>Dirección</th>
+            <th class="nowrap">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let d of dirs">
+            <td class="truncate">{{ d.direccion }}</td>
+            <td class="nowrap">
+              <button class="btn-mini" (click)="goMovs(d)">
+                Ver movimientos
+              </button>
+              <button class="btn-mini" (click)="goServicios(d)">
+                Servicios
+              </button>
+              <button class="btn-mini" (click)="eliminarDir(d)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="!dirsLoading && dirs.length === 0">
+            <td colspan="2" class="muted">No hay direcciones todavía.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal crear/editar amoblado -->
+  <div class="overlay" *ngIf="formOpen" (click)="cancelarForm()"></div>
+  <div
+    class="modal modal-form"
+    *ngIf="formOpen"
+    (click)="$event.stopPropagation()"
+  >
+    <button class="modal-close" (click)="cancelarForm()">✕</button>
+    <h3>{{ editingId ? "Editar amoblado" : "Nuevo amoblado" }}</h3>
+
+    <div class="modal-body">
+      <div class="modal-grid">
+        <!-- INQUILINO (autocomplete) -->
+        <label>
+          <span class="lbl">Inquilino</span>
+          <div class="autocomplete">
+            <input
+              type="text"
+              [(ngModel)]="inqTerm"
+              (input)="onInqTermInput()"
+              (focus)="showInqPanel = true"
+              (blur)="onInqBlur()"
+              placeholder="Buscar inquilino..."
+            />
+            <div class="ac-panel" *ngIf="showInqPanel && inqSugs.length">
+              <div
+                class="ac-item"
+                *ngFor="let i of inqSugs"
+                (mousedown)="seleccionarInq(i)"
+              >
+                {{ i.nombre }}
+              </div>
+            </div>
+          </div>
+        </label>
+
+        <!-- DIRECCIÓN (autocomplete propio de amoblados) -->
+        <label>
+          <span class="lbl">Dirección</span>
+          <div class="autocomplete">
+            <input
+              type="text"
+              [(ngModel)]="dirTerm"
+              (input)="onDirInput()"
+              (focus)="showDirPanel = true"
+              (blur)="onDirBlur()"
+              placeholder="Dirección"
+            />
+            <div class="ac-panel" *ngIf="showDirPanel && dirSugs.length">
+              <div
+                class="ac-item"
+                *ngFor="let s of dirSugs"
+                (mousedown)="seleccionarDir(s)"
+              >
+                {{ s.direccion }}
+              </div>
+            </div>
+          </div>
+        </label>
+
+        <!-- FECHA simple (cuando NO es rango) -->
+        <label *ngIf="!rangeMode">
+          <span class="lbl">Fecha</span>
+          <input type="date" [(ngModel)]="form.fecha" />
+        </label>
+
+        <!-- Toggle de rango -->
+        <label>
+          <span class="lbl">Crear rango de días</span>
+          <select [(ngModel)]="rangeMode">
+            <option [ngValue]="false">No</option>
+            <option [ngValue]="true">Sí</option>
+          </select>
+        </label>
+
+        <!-- RANGO de fechas (show si rangeMode) -->
+        <label *ngIf="rangeMode">
+          <span class="lbl">Desde</span>
+          <input type="date" [(ngModel)]="fecha_from" />
+        </label>
+        <label *ngIf="rangeMode">
+          <span class="lbl">Hasta</span>
+          <input type="date" [(ngModel)]="fecha_to" />
+        </label>
+
+        <!-- MONTOS -->
+        <label>
+          <span class="lbl">Alquiler</span>
+          <input
+            type="number"
+            [(ngModel)]="form.alquiler_prop"
+            (input)="onAlquilerChange()"
+          />
+        </label>
+
+        <label>
+          <span class="lbl">ADM</span>
+          <input type="number" [(ngModel)]="form.adm" (input)="onAdmChange()" />
+        </label>
+
+        <!-- Botón calculadora (se habilita cuando hay alquiler cargado) -->
+        <div class="inline-tools">
+          <button
+            class="btn-secondary"
+            (click)="openCalc()"
+            [disabled]="!form.alquiler_prop"
+          >
+            Calculadora ADM / Neto
+          </button>
+        </div>
+
+        <!-- <label>
+  <span class="lbl">ADM (texto)</span>
+  <input type="text" [(ngModel)]="form.adm_text" />
+</label> -->
+
+        <label>
+          <span class="lbl">Neto Prop.</span>
+          <input type="number" [(ngModel)]="form.neto_propietario" />
+        </label>
+
+        <!-- ESTADO / Pago inq (OPCIONAL, no obligatorio) -->
+        <label>
+          <span class="lbl">Estado</span>
+          <select [(ngModel)]="form.estado_pago" (change)="onEstadoChange()">
+            <option value="">—</option>
+            <option value="pagado">Pagado</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="no pagado">No pagado</option>
+          </select>
+        </label>
+        <!-- Campo visible SOLO si estado = pendiente -->
+        <label *ngIf="isPendiente">
+          <span class="lbl">Detalle de Pendiente (monto o texto)</span>
+          <input
+            type="text"
+            [(ngModel)]="pendienteText"
+            placeholder="Ej: 12000 o 'falta luz'"
+          />
+          <span class="hint muted"
+            >Se guardará como “pendiente: {{ pendienteText || "..." }}”.</span
+          >
+        </label>
+
+        <label>
+          <span class="lbl">Fecha pago inquilino (opcional)</span>
+          <input type="date" [(ngModel)]="form.fecha_pago_inquilino" />
+        </label>
+
+        <label>
+          <span class="lbl">Vencimiento (opcional)</span>
+          <input type="date" [(ngModel)]="form.vencimiento" />
+        </label>
+
+        <label class="span2">
+          <span class="lbl">Notas</span>
+          <textarea [(ngModel)]="form.notas" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <div class="grow"></div>
+      <button class="btn-primary" (click)="guardar()">
+        {{
+          editingId ? "Guardar cambios" : rangeMode ? "Crear rango" : "Crear"
+        }}
+      </button>
+      <button class="btn-secondary" (click)="cancelarForm()">Cancelar</button>
+    </div>
+  </div>
+</div>
+<!-- ============== MODAL: CALCULADORA ============== -->
+<div class="overlay" *ngIf="showCalc" (click)="closeCalc()"></div>
+<div
+  class="modal"
+  *ngIf="showCalc"
+  (click)="$event.stopPropagation()"
+  role="dialog"
+  aria-modal="true"
+>
+  <button class="modal-close" (click)="closeCalc()" aria-label="Cerrar">
+    ×
+  </button>
+  <h4>Calculadora ADM / Neto</h4>
+
+  <div class="calc-section">
+    <div class="calc-row">
+      <label class="radio-row">
+        <input
+          type="radio"
+          [(ngModel)]="calcMode"
+          value="porcentaje"
+          (change)="recomputeCalc()"
+        />
+        ADM = Alquiler ×
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          [(ngModel)]="calcPorcentaje"
+          (input)="recomputeCalc()"
+          style="width: 90px"
+        />
+        %
+      </label>
+    </div>
+
+    <div class="calc-row">
+      <label class="radio-row">
+        <input
+          type="radio"
+          [(ngModel)]="calcMode"
+          value="monto"
+          (change)="recomputeCalc()"
+        />
+        ADM =
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          [(ngModel)]="calcMonto"
+          (input)="recomputeCalc()"
+          style="width: 120px"
+        />
+      </label>
+    </div>
+
+    <div class="calc-row">
+      <label class="radio-row">
+        <input
+          type="radio"
+          [(ngModel)]="calcMode"
+          value="sin"
+          (change)="recomputeCalc()"
+        />
+        Sin cálculo (ADM = 0)
+      </label>
+    </div>
+  </div>
+
+  <div class="calc-preview">
+    <div>
+      <strong>Alquiler:</strong> {{ calcPreview.alquiler | number : "1.2-2" }}
+    </div>
+    <div><strong>ADM:</strong> {{ calcPreview.adm | number : "1.2-2" }}</div>
+    <div>
+      <strong>Neto Propietario = Alquiler - ADM:</strong>
+      {{ calcPreview.neto | number : "1.2-2" }}
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <div class="grow"></div>
+    <button (click)="applyCalc()" [disabled]="!form.alquiler_prop">
+      Usar estos valores
+    </button>
+    <button class="btn-secondary" (click)="closeCalc()">Cancelar</button>
+  </div>
+</div>
+<!-- Overlay detalle -->
+<div class="overlay" *ngIf="detailOpen" (click)="closeDetail()"></div>
+
+<div
+  class="modal modal-detail"
+  *ngIf="detailOpen"
+  (click)="$event.stopPropagation()"
+>
+  <button class="modal-close" (click)="closeDetail()">✕</button>
+  <h3>Detalle amoblado #{{ detail?.id }}</h3>
+
+  <div class="detail-grid">
+    <div>
+      <div class="lbl">Fecha</div>
+      <div>{{ detail?.fecha || "—" }}</div>
+    </div>
+    <div>
+      <div class="lbl">Vencimiento</div>
+      <div>{{ detail?.vencimiento || "—" }}</div>
+    </div>
+
+    <div>
+      <div class="lbl">Inquilino</div>
+      <div>{{ detail?.inquilino || "—" }}</div>
+    </div>
+    <div>
+      <div class="lbl">Dirección</div>
+      <div>{{ detail?.direccion || "—" }}</div>
+    </div>
+
+    <div>
+      <div class="lbl">Alquiler</div>
+      <div class="nowrap">{{ detail?.alquiler_prop | number : "1.2-2" }}</div>
+    </div>
+    <div>
+      <div class="lbl">ADM</div>
+      <div class="nowrap">{{ detail?.adm | number : "1.2-2" }}</div>
+    </div>
+
+    <div>
+      <div class="lbl">Neto Prop.</div>
+      <div class="nowrap">
+        {{ detail?.neto_propietario | number : "1.2-2" }}
+      </div>
+    </div>
+    <div>
+      <div class="lbl">Estado</div>
+      <div>{{ detail?.estado_pago || "—" }}</div>
+    </div>
+
+    <div>
+      <div class="lbl">Pago Inquilino</div>
+      <div>{{ detail?.fecha_pago_inquilino || "—" }}</div>
+    </div>
+
+    <div class="span2">
+      <div class="lbl">Notas</div>
+      <div class="detail-notes">{{ detail?.notas || "—" }}</div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <div class="grow"></div>
+    <button
+      class="btn-outline"
+      (click)="printAmobladoDetalle()"
+      title="Imprimir detalle"
+    >
+      🖨 Imprimir
+    </button>
+    <button class="btn-primary" (click)="editarDesdeDetalle()">Editar</button>
+    <button class="btn-secondary" (click)="closeDetail()">Cerrar</button>
+  </div>
+</div>

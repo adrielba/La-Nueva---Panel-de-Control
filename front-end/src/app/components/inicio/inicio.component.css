@@ -1,4 +1,384 @@
-.inicio-container{
-    text-align: center;
-    font-family: Arial, Helvetica, sans-serif;
+.inicio-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+.inicio-container h1 {
+  font-size: 26px;
+  margin: 0 0 6px;
+}
+.inicio-container h2 {
+  font-size: 16px;
+  margin: 0 0 8px;
+  color: #6b7280;
+}
+.inicio-container h3 {
+  font-size: 14px;
+  margin: 0 0 16px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* Card de Recordatorios en Inicio */
+.reminders-card {
+  margin-top: 14px;
+  padding: 14px;
+}
+
+.rem-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+.rem-actions .left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rem-actions .left input {
+  width: 80px;
+  padding: 6px 8px;
+}
+.rem-actions .right {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-icon,
+.btn-mini {
+  border: 0;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 600;
+}
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+.btn-secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+.btn-secondary:hover {
+  filter: brightness(0.98);
+}
+.btn-icon {
+  background: #f3f4f6;
+  padding: 6px 10px;
+}
+.btn-mini {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.btn-mini.success {
+  background: #10b981;
+  color: #fff;
+}
+.btn-mini.warn {
+  background: #f59e0b;
+  color: #111;
+}
+.btn-mini.danger {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* Overlay / Modal específicos de recordatorios */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 50;
+}
+.modal.reminders-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(1300px, calc(100vw - 32px));
+  max-height: 85vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  z-index: 51;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+.modal-close {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.toolbar.compact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 12px;
+}
+.toolbar .grow {
+  flex: 1;
+}
+.pill {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #fde68a;
+  color: #7c2d12;
+  border-radius: 999px;
+  font-size: 12px;
+  margin-right: 6px;
+}
+.pill.neutral {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.table-wrapper {
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+.reminders-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.reminders-table th,
+.reminders-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: top;
+}
+.reminders-table th {
+  text-align: left;
+  background: #f9fafb;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.truncate {
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.actions-col {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.muted {
+  color: #6b7280;
+}
+.reminders-table td.message-cell {
+  max-width: 480px; /* ajustá a gusto */
+  white-space: normal; /* permite múltiples líneas */
+  /*word-break: break-word; por si hay textos largos */
+}
+
+/* Badge para tipo */
+.badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.badge-contrato {
+  background: #e0f2fe; /* celeste */
+  color: #075985;
+  border: 1px solid #bae6fd;
+}
+.badge-mensual {
+  background: #ecfdf5; /* verde */
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+/* Texto del mensaje */
+.msg-text {
+  display: inline; /* o inline-block si preferís */
+  line-height: 1.35;
+}
+
+/* Opcional: si querés, mantené truncamiento solo en otras columnas */
+.reminders-table td.truncate {
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.message-cell {
+  max-width: 520px; /* ajustá a gusto */
+}
+
+.msg-text {
+  display: inline-block;
+  vertical-align: top;
+  line-height: 1.35;
+  position: relative;
+}
+
+.msg-text.clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* cantidad de líneas visibles */
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: calc(1.35em * 3);
+  padding-right: 36px; /* espacio para el fade */
+}
+
+/* Pequeño fade a la derecha cuando está clamped */
+.msg-text.clamped::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 36px;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), #fff 70%);
+}
+
+/* expandido: sin límites ni fade */
+.msg-text.expanded {
+  -webkit-line-clamp: initial;
+  line-clamp: 3;
+  max-height: none;
+}
+.msg-text.expanded::after {
+  display: none;
+}
+
+/* Botón texto para ver más / copiar */
+.link-btn {
+  background: transparent;
+  border: 0;
+  color: #2563eb;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 6px;
+  margin-left: 4px;
+  border-radius: 6px;
+}
+.link-btn:hover {
+  text-decoration: underline;
+}
+.link-btn.muted {
+  color: #6b7280;
+  font-weight: 600;
+}
+.badge-cambio {
+  background: #e0f2fe; /* celeste */
+  color: #075985;
+  border: 1px solid #bae6fd;
+}
+
+.modal.reminders-modal {
+  width: min(900px, calc(100vw - 32px)); /* antes: 1000px */
+}
+
+/* El scroll horizontal vive dentro del wrapper de la tabla */
+.table-wrapper {
+  overflow-x: auto; /* ⬅ fuerza barra horizontal si hace falta */
+  overflow-y: auto;
+}
+
+/* La tabla puede ser más ancha que el modal => aparece la barra */
+.reminders-table {
+  width: 100%;
+  min-width: 1100px; /* ajustá a gusto: 1000–1200px suele ir bien */
+  border-collapse: collapse;
+}
+
+/* Evito que se “coma” Acciones cuando el ancho es justo */
+.actions-col {
+  min-width: 220px;
+}
+
+/* Si el mensaje te abre demasiado, lo limito un poco */
+.reminders-table td.message-cell {
+  max-width: 460px; /* bajé un toque desde 520px */
+}
+
+/* Modal un poco más angosto para que no “coma” pantalla */
+.modal.reminders-modal {
+  width: min(1300px, calc(100vw - 32px)); /* antes: 1000px */
+}
+
+/* El scroll horizontal vive dentro del wrapper de la tabla */
+.table-wrapper {
+  overflow-x: auto; /* ⬅ fuerza barra horizontal si hace falta */
+  overflow-y: auto;
+}
+
+/* La tabla puede ser más ancha que el modal => aparece la barra */
+.reminders-table {
+  width: 100%;
+  min-width: 1100px; /* ajustá a gusto: 1000–1200px suele ir bien */
+  border-collapse: collapse;
+}
+
+/* Evito que se “coma” Acciones cuando el ancho es justo */
+.actions-col {
+  min-width: 220px;
+}
+
+/* Si el mensaje te abre demasiado, lo limito un poco */
+.reminders-table td.message-cell {
+  max-width: 460px; /* bajé un toque desde 520px */
+}
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ccc;
+  border-top-color: #007bff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.success-msg {
+  color: #28a745;
+  margin-left: 8px;
+  font-size: 0.9rem;
+  opacity: 1;
+  animation: fadeOut 3s forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }

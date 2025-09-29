@@ -1,0 +1,95 @@
+<section class="card">
+  <h3>Propiedades</h3>
+
+  <div class="toolbar">
+    <div class="filters">
+      <input
+        [(ngModel)]="q"
+        placeholder="Buscar dirección / propietario"
+        (keyup.enter)="page = 1; load()"
+      />
+      <button
+        (click)="page = 1; load()"
+        [disabled]="loading || syncing || cleaning"
+      >
+        Buscar
+      </button>
+      <button
+        (click)="q = ''; page = 1; load()"
+        [disabled]="loading || syncing || cleaning"
+      >
+        Limpiar Búsqueda
+      </button>
+
+      <div class="print-actions">
+        <button
+          class="btn-secondary"
+          (click)="printPropiedadesFull()"
+          [disabled]="loading || syncing || cleaning"
+        >
+          🖨 Imprimir lista completa
+        </button>
+      </div>
+    </div>
+    <div class="paginator">
+      <button (click)="prev()" [disabled]="page === 1 || syncing || cleaning">
+        Anterior
+      </button>
+      <span>Página {{ page }} de {{ totalPages }}</span>
+      <button
+        (click)="next()"
+        [disabled]="page >= totalPages || syncing || cleaning"
+      >
+        Siguiente
+      </button>
+    </div>
+  </div>
+
+  <p *ngIf="loading">Cargando…</p>
+  <p *ngIf="errorMsg" class="err">{{ errorMsg }}</p>
+
+  <div class="table-wrapper" *ngIf="rows.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Dirección</th>
+          <th>Propietario</th>
+          <th>Tipo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let r of rows"
+          class="clickable-row"
+          (click)="openDetalle(r)"
+        >
+          <td>{{ r.direccion }}</td>
+          <td>{{ r.propietario_nombre || "—" }}</td>
+          <td>{{ r.domicilio_tipo || "—" }}</td>
+          <td>
+            <!-- Botón oculto: deja la funcionalidad lista, pero no visible -->
+            <button
+              class="hidden-action"
+              (click)="$event.stopPropagation(); eliminar(r)"
+            >
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p *ngIf="!rows.length && !loading && !errorMsg">Sin resultados.</p>
+</section>
+
+<!-- OVERLAY de operaciones largas -->
+<div class="busy-overlay" *ngIf="syncing || cleaning">
+  <div class="busy-box">
+    <div class="spinner"></div>
+    <div class="busy-text">
+      {{ syncing || cleaning ? "Actualizando propiedades…" : "" }}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,209 @@
+.props-page {
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+}
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  padding: 14px;
+}
+
+/* ===== Toolbar: filtros en la primera fila, paginador SIEMPRE debajo ===== */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start; /* que no estire verticalmente */
+}
+.filters,
+.right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1 1 100%; /* siempre ocupan toda la fila superior */
+  flex-wrap: wrap;
+}
+
+/* Paginador: se fija a una fila completa debajo de filters */
+.paginator {
+  order: 2; /* forzamos que venga después de filters */
+  flex: 1 1 100%; /* toma todo el ancho, su propia fila */
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 6px 0 0;
+}
+
+/* ===== Botones (look & feel unificado) ===== */
+.toolbar button,
+.paginator button,
+.table-wrapper button {
+  appearance: none;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #111827;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.02s ease, background 0.15s ease,
+    border-color 0.15s ease;
+}
+.toolbar button:hover,
+.paginator button:hover,
+.table-wrapper button:hover {
+  background: #f9fafb;
+  border-color: #dfe3e6;
+}
+.toolbar button:active,
+.paginator button:active,
+.table-wrapper button:active {
+  transform: translateY(1px);
+}
+.toolbar button:focus-visible,
+.paginator button:focus-visible,
+.table-wrapper button:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 1px;
+  border-color: #93c5fd;
+}
+.toolbar button[disabled],
+.paginator button[disabled],
+.table-wrapper button[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Variantes dentro de filters (sin tocar el HTML):
+   1° botón = "Buscar" (primario), 2° = "Limpiar Búsqueda" (terciario) */
+.filters button:nth-of-type(1) {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+.filters button:nth-of-type(1):hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+.filters button:nth-of-type(2) {
+  background: #ffffff;
+  border-color: #e5e7eb;
+  color: #374151;
+}
+.filters button:nth-of-type(2):hover {
+  background: #f3f4f6;
+}
+
+/* Botón “Imprimir lista completa” (ya tiene .btn-secondary) */
+.btn-secondary {
+  background: #ffffff;
+  border-color: #d1d5db;
+  color: #111827;
+}
+.btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+/* Input suave para acompañar botones */
+.filters input[type="text"],
+.filters input[type="search"] {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #111827;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  min-width: 260px;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.filters input[type="text"]:focus,
+.filters input[type="search"]:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* ===== Tabla ===== */
+.table-wrapper {
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+th,
+td {
+  border-bottom: 1px solid #f1f3f5;
+  padding: 8px;
+  text-align: left;
+}
+thead th {
+  background: #f8fafc;
+  font-weight: 700;
+}
+.sortable {
+  cursor: pointer;
+}
+.msg.err {
+  color: #c00;
+}
+.cell-wrap {
+  white-space: normal;
+  line-height: 1.25;
+}
+
+/* ===== Overlay de procesos ===== */
+.busy-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: grid;
+  place-items: center;
+  z-index: 2000;
+}
+.busy-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px 22px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  min-width: 280px;
+  justify-content: center;
+}
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+.busy-text {
+  font-weight: 600;
+  color: #1f2937;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== Filas clickeables ===== */
+.clickable-row {
+  cursor: pointer;
+}
+.clickable-row:hover {
+  background: #f9fafb;
+}
